@@ -9,8 +9,8 @@ SHELL=/bin/bash
 #search-ui
 export PORT=8082
 
-#matchID base paths
-export APP = matchid
+#base paths
+export APP = search-ui
 export APP_PATH := $(shell pwd)
 export FRONTEND := ${APP_PATH}
 export NGINX = ${APP_PATH}/nginx
@@ -30,14 +30,12 @@ export ES_INDEX = deces
 dummy		    := $(shell touch artifacts)
 include ./artifacts
 
-commit              := $(shell git rev-parse HEAD | cut -c1-8)
+commit              := $(shell git describe --tags || cat VERSION )
 lastcommit          := $(shell touch .lastcommit && cat .lastcommit)
-commit-frontend     := $(shell (cd ${FRONTEND} 2> /dev/null) && git rev-parse HEAD | cut -c1-8)
-lastcommit-frontend := $(shell (cat ${FRONTEND}/.lastcommit 2>&1) )
 date                := $(shell date -I)
 id                  := $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 
-APP_VERSION := commit
+APP_VERSION :=  commit
 
 include /etc/os-release
 
@@ -86,13 +84,13 @@ frontend-update:
 update: frontend-update
 
 frontend-dev:
-ifneq "$(commit-frontend)" "$(lastcommit-frontend)"
+ifneq "$(commit)" "$(lastcommit)"
 	@echo docker-compose up ${APP} search-ui frontend for dev after new commit
 	env
 	${DC} -f ${DC_FILE}-dev-frontend.yml up --build -d
-	@echo "${commit-frontend}" > ${FRONTEND}/.lastcommit
+	@echo "${commit}" > ${FRONTEND}/.lastcommit
 else
-	@echo docker-compose up matchID frontend for dev
+	@echo docker-compose up ${APP} frontend for dev
 	${DC} -f  ${DC_FILE}-dev-frontend.yml up -d
 endif
 
@@ -103,20 +101,20 @@ dev: network frontend-stop frontend-dev
 
 dev-stop: frontend-dev-stop newtork-stop
 
-frontend-build: network frontend-download
-ifneq "$(commit-frontend)" "$(lastcommit-frontend)"
+frontend-build: network
+ifneq "$(commit)" "$(lastcommit)"
 	@echo building ${APP} search-ui frontend after new commit
 	@make clean
 	@sudo mkdir -p ${FRONTEND}/dist
 	${DC} -f ${DC_FILE}-build-frontend.yml up --build
-	@echo "${commit-frontend}" > ${FRONTEND}/.lastcommit
+	@echo "${commit}" > ${FRONTEND}/.lastcommit
 endif
 
 frontend-stop:
 	${DC} -f ${DC_FILE}.yml down
 
 frontend: frontend-build
-	@echo docker-compose up matchID frontend
+	@echo docker-compose up ${APP} frontend
 	${DC} -f ${DC_FILE}.yml up -d
 
 stop: frontend-stop

@@ -4,7 +4,7 @@ version: '3.4'
 
 services:
   nginx-development:
-    image: ${APP}-nginx-development
+    image: ${DC_PREFIX}-nginx-development
     build:
       context: ${NGINX}
       target: development
@@ -12,7 +12,7 @@ services:
       args:
         app_name: ${APP}
         app_ver: ${APP_VERSION}
-    container_name: ${APP}-nginx-development
+    container_name: ${DC_PREFIX}-nginx-development
     depends_on:
       - frontend-development
     environment:
@@ -48,8 +48,8 @@ services:
         NPM_LATEST: ${NPM_LATEST}
         NPM_GIT: ${NPM_GIT}
         NPM_VERBOSE: ${NPM_VERBOSE}
-    image: ${APP}-frontend-development:${APP_VERSION}
-    container_name: ${APP}-frontend-development
+    image: ${DC_PREFIX}-frontend-development:${APP_VERSION}
+    container_name: ${DC_PREFIX}-frontend-development
     environment:
       - APP
       - PORT
