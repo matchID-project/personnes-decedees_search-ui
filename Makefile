@@ -13,7 +13,14 @@ export PORT=8082
 export APP = search-ui
 export APP_PATH := $(shell pwd)
 export FRONTEND := ${APP_PATH}
+export FRONTEND_DEV_HOST = frontend-development
+export FRONTEND_DEV_PORT = ${PORT}
 export NGINX = ${APP_PATH}/nginx
+export API_USER_LIMIT_RATE=1r/m
+export API_USER_BURST=3 nodelay
+export API_USER_SCOPE=http_x_forwarded_for
+export API_GLOBAL_LIMIT_RATE=5r/s
+export API_GLOBAL_BURST=20 nodelay
 
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
@@ -24,6 +31,8 @@ export GIT_ORIGIN=origin
 export GIT_BRANCH=dev
 
 # elasticsearch defaut configuration
+export ES_HOST = elasticsearch
+export ES_PORT = 9200
 export ES_PATH = /${APP}/api/v0
 export ES_INDEX = deces
 
@@ -35,7 +44,7 @@ lastcommit          := $(shell touch .lastcommit && cat .lastcommit)
 date                := $(shell date -I)
 id                  := $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 
-APP_VERSION :=  commit
+export APP_VERSION :=  ${commit}
 
 include /etc/os-release
 
@@ -85,8 +94,7 @@ update: frontend-update
 
 frontend-dev:
 ifneq "$(commit)" "$(lastcommit)"
-	@echo docker-compose up ${APP} search-ui frontend for dev after new commit
-	env
+	@echo docker-compose up ${APP} frontend for dev after new commit ${APP_VERSION}
 	${DC} -f ${DC_FILE}-dev-frontend.yml up --build -d
 	@echo "${commit}" > ${FRONTEND}/.lastcommit
 else
@@ -103,7 +111,7 @@ dev-stop: frontend-dev-stop newtork-stop
 
 frontend-build: network
 ifneq "$(commit)" "$(lastcommit)"
-	@echo building ${APP} search-ui frontend after new commit
+	@echo building ${APP} search-ui frontend after new commit ${APP_VERSION}
 	@make clean
 	@sudo mkdir -p ${FRONTEND}/dist
 	${DC} -f ${DC_FILE}-build-frontend.yml up --build

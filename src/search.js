@@ -3,9 +3,9 @@
 */
 import fetch from "node-fetch";
 
-exports.handler = function(event, context, callback) {
+export default function(event, context, callback) {
   const path = process.env.ES_PATH;
-  const path = process.env.ES_INDEX;
+  const index = process.env.ES_INDEX;
 
   fetch(`${path}/${index}/_search`, {
     method: "POST",

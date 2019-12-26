@@ -70,6 +70,8 @@ ARG app_path
 ARG app_name
 ARG app_ver
 ENV PORT ${PORT}
+ENV ES_PATH ${ES_PATH}
+ENV ES_INDEX ${ES_INDEX}
 
 VOLUME /$app_path/src
 VOLUME /$app_path/public

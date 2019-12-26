@@ -1,7 +1,8 @@
-import handler from "./search";
-
 export default async function runRequest(body) {
-  const response = await fetch(handler, {
+  const path = process.env.ES_PATH;
+  const index = process.env.ES_INDEX;
+
+  const response = await fetch(`${path}/${index}/_search`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body)
