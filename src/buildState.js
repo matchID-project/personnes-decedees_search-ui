@@ -1,5 +1,7 @@
 import buildStateFacets from "./buildStateFacets";
 
+import enrichRecord from "./enrichRecord";
+
 function buildTotalPages(resultsPerPage, totalResults) {
   if (!resultsPerPage) return 0;
   if (totalResults === 0) return 1;
@@ -36,7 +38,8 @@ function buildResults(hits) {
     return { raw: value, ...(snippet && { snippet }) };
   };
 
-  return hits.map(record => {
+  console.log("hits:",hits);
+  return hits.map(enrichRecord).map(record => {
     return Object.entries(record._source)
       .map(([fieldName, fieldValue]) => [
         fieldName,

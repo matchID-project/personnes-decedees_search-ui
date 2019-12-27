@@ -12,14 +12,158 @@ function buildSort(sortDirection, sortField) {
 }
 
 function buildMatch(searchTerm) {
-  return searchTerm
-    ? {
-        multi_match: {
-          query: searchTerm,
-          fields: ["title", "description"]
-        }
+  searchTerm = searchTerm ? searchTerm.normalize('NFKD').replace(/[\u0300-\u036f]/g, "").split(/\s+/) : []
+  let date = searchTerm.filter( x => x.match(/^\d{2}\/\d{2}\/\d{4}$/)).map( x => x.replace(/(\d{2})\/(\d{2})\/(\d{4})/,"$3$2$1"));
+  date = date.length ? date[0] : null;
+  let names = searchTerm.filter( x => x.match(/[a-z]+/)).filter( x => !x.match(/(el|le|de|la|los)/))
+
+  const default_query = { match_all: {} }
+  let names_query
+  let date_query
+
+  if (names.length === 2) {
+    names_query = {
+      bool: {
+        minimum_should_match: 1,
+        should: [
+          {
+            bool: {
+              must: [
+                {
+                  match: {
+                    NOM: {
+                      query: names[0],
+                      fuzziness: "auto"
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          PRENOMS: {
+                            query: names[1],
+                            fuzziness: "auto"
+                          }
+                        }
+                      }
+                    ],
+                    should: [
+                      {
+                        span_first: {
+                          match: {
+                            span_term: {
+                              PRENOMS: names[1]
+                            }
+                          },
+                          end: 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            bool: {
+              must: [
+                {
+                  match: {
+                    NOM: {
+                      query: names[1],
+                      fuzziness: "auto"
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          PRENOMS: {
+                            query: names[0],
+                            fuzziness: "auto"
+                          }
+                        }
+                      }
+                    ],
+                    should: [
+                      {
+                        span_first: {
+                          match: {
+                            span_term: {
+                              PRENOMS: names[0]
+                            }
+                          },
+
+                          end: 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
       }
-    : { match_all: {} };
+    }
+  } else if (names.length > 0) {
+    names_query = {
+      multi_match : {
+        query:      names.join(" "),
+        type:       "cross_fields",
+        fields:     [ "NOM", "PRENOMS" ],
+        operator:   "and"
+      }
+    }
+  }
+
+  if (date) {
+    date_query = {
+      bool: {
+        minimum_should_match: 1,
+        should: [
+          {
+            match: {
+              DATE_NAISSANCE: {
+                query: date,
+                fuzziness: "auto"
+              }
+            }
+          },
+          {
+            match: {
+              DATE_DECES: {
+                query: names[1],
+                fuzziness: "auto"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  const query = date_query
+    ? names_query
+      ?
+        {
+          bool: {
+            must: [ names_query ],
+            should: [ date_query ]
+          }
+        }
+      : date_query
+    : names_query
+      ?
+        names_query
+      :
+        default_query
+
+  return query
 }
 
 /*
@@ -60,6 +204,7 @@ export default function buildRequest(state) {
     // Static query Configuration
     // --------------------------
     // https://www.elastic.co/guide/en/elasticsearch/reference/7.x/search-request-highlighting.html
+    min_score: 5,
     highlight: {
       fragment_size: 200,
       number_of_fragments: 1,
@@ -69,36 +214,20 @@ export default function buildRequest(state) {
       }
     },
     //https://www.elastic.co/guide/en/elasticsearch/reference/7.x/search-request-source-filtering.html#search-request-source-filtering
-    _source: ["id", "nps_link", "title", "description"],
+    _source: [
+      "CODE_INSEE_DECES","CODE_INSEE_NAISSANCE",
+      "COMMUNE_DECES","COMMUNE_NAISSANCE",
+      "DATE_DECES","DATE_NAISSANCE",
+      "DEPARTEMENT_DECES","DEPARTEMENT_NAISSANCE",
+      "NOM","PRENOMS",
+      "NUM_DECES",
+      "PAYS_DECES","PAYS_DECES_CODEISO3",
+      "PAYS_NAISSANCE","PAYS_NAISSANCE_CODEISO3",
+      "SEXE","UID"],
     aggs: {
-      states: { terms: { field: "states.keyword", size: 30 } },
-      world_heritage_site: {
-        terms: { field: "world_heritage_site" }
-      },
-      visitors: {
-        range: {
-          field: "visitors",
-          ranges: [
-            { from: 0.0, to: 10000.0, key: "0 - 10000" },
-            { from: 10001.0, to: 100000.0, key: "10001 - 100000" },
-            { from: 100001.0, to: 500000.0, key: "100001 - 500000" },
-            { from: 500001.0, to: 1000000.0, key: "500001 - 1000000" },
-            { from: 1000001.0, to: 5000000.0, key: "1000001 - 5000000" },
-            { from: 5000001.0, to: 10000000.0, key: "5000001 - 10000000" },
-            { from: 10000001.0, key: "10000001+" }
-          ]
-        }
-      },
-      acres: {
-        range: {
-          field: "acres",
-          ranges: [
-            { from: -1.0, key: "Any" },
-            { from: 0.0, to: 1000.0, key: "Small" },
-            { from: 1001.0, to: 100000.0, key: "Medium" },
-            { from: 100001.0, key: "Large" }
-          ]
-        }
+      COMMUNE_NAISSANCE: { terms: { field: "COMMUNE_NAISSANCE.keyword", size: 30 } },
+      PAYS_NAISSANCE: {
+        terms: { field: "PAYS_NAISSANCE.keyword" }
       }
     },
 

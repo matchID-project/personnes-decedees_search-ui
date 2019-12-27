@@ -46,7 +46,7 @@ const config = {
     const responseJsonWithDisjunctiveFacetCounts = await applyDisjunctiveFaceting(
       responseJson,
       state,
-      ["visitors", "states"]
+      ["PAYS_NAISSANCE", "COMMUNE_NAISSANCE"]
     );
     return buildState(responseJsonWithDisjunctiveFacetCounts, resultsPerPage);
   }
@@ -64,11 +64,8 @@ export default function App() {
                   <SearchBox
                     autocompleteMinimumCharacters={3}
                     autocompleteResults={{
-                      linkTarget: "_blank",
-                      sectionTitle: "Results",
+                      sectionTitle: "Résultats",
                       titleField: "title",
-                      urlField: "nps_link",
-                      shouldTrackClickThrough: true,
                       clickThroughTags: ["test"]
                     }}
                     autocompleteSuggestions={true}
@@ -76,7 +73,7 @@ export default function App() {
                 }
                 sideContent={
                   <div>
-                    {wasSearched && (
+                    {/* {wasSearched && (
                       <Sorting
                         label={"Sort by"}
                         sortOptions={[
@@ -86,35 +83,30 @@ export default function App() {
                             direction: ""
                           },
                           {
-                            name: "Title",
-                            value: "title",
+                            name: "NOM",
+                            value: "Nom",
                             direction: "asc"
                           }
                         ]}
                       />
-                    )}
+                    )} */}
                     <Facet
-                      field="states"
-                      label="States"
+                      field="PAYS_NAISSANCE"
+                      label="Pays de naissance"
                       filterType="any"
                       isFilterable={true}
                     />
                     <Facet
-                      field="world_heritage_site"
-                      label="World Heritage Site?"
-                    />
-                    <Facet field="visitors" label="Visitors" filterType="any" />
-                    <Facet
-                      field="acres"
-                      label="Acres"
-                      view={SingleSelectFacet}
-                    />
+                      field="COMMUNE_NAISSANCE"
+                      label="Commune de naissance"
+                      filterType="any"
+                      isFilterable={true}                    />
                   </div>
                 }
                 bodyContent={
                   <Results
                     titleField="title"
-                    urlField="nps_link"
+                    urlField="COMMUNE_NAISSANCE"
                     shouldTrackClickThrough={true}
                   />
                 }
