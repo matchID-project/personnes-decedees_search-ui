@@ -1,6 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 artifacts
 .lastcommit
+dist
+dist-build
 
 # dependencies
 /node_modules
