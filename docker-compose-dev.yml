@@ -29,8 +29,8 @@ services:
       - API_GLOBAL_LIMIT_RATE
       - API_GLOBAL_BURST
     volumes:
-      - ${APP_PATH}/nginx/nginx-dev.template:/etc/nginx/conf.d/default.template
-      - ${APP_PATH}/nginx/nginx.template:/etc/nginx/nginx.template
+      - ${NGINX}/nginx-dev.template:/etc/nginx/conf.d/default.template
+      - ${NGINX}/nginx/nginx.template:/etc/nginx/nginx.template
       - ${FRONTEND}/public:/usr/share/nginx/html
     ports:
       - ${PORT}:80

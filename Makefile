@@ -79,7 +79,8 @@ ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
 endif
 
 clean:
-	sudo rm -rf ${FRONTEND}/dist
+	@sudo rm -rf ${FRONTEND}/dist
+	@sudo mkdir -p ${FRONTEND}/dist
 
 network-stop:
 	docker network rm ${DC_NETWORK}
@@ -95,26 +96,29 @@ update: frontend-update
 frontend-dev:
 ifneq "$(commit)" "$(lastcommit)"
 	@echo docker-compose up ${APP} frontend for dev after new commit ${APP_VERSION}
-	${DC} -f ${DC_FILE}-dev-frontend.yml up --build -d
+	${DC} -f ${DC_FILE}-dev.yml up --build -d
 	@echo "${commit}" > ${FRONTEND}/.lastcommit
 else
 	@echo docker-compose up ${APP} frontend for dev
-	${DC} -f  ${DC_FILE}-dev-frontend.yml up -d
+	${DC} -f  ${DC_FILE}-dev.yml up -d
 endif
 
 frontend-dev-stop:
-	${DC} -f ${DC_FILE}-dev-frontend.yml down
+	${DC} -f ${DC_FILE}-dev.yml down
 
 dev: network frontend-stop frontend-dev
 
 dev-stop: frontend-dev-stop
 
+build: frontend-build
+
 frontend-build: network
 ifneq "$(commit)" "$(lastcommit)"
 	@echo building ${APP} search-ui frontend after new commit ${APP_VERSION}
 	@make clean
-	@sudo mkdir -p ${FRONTEND}/dist
-	${DC} -f ${DC_FILE}-build-frontend.yml up --build
+	@sudo mkdir -p ${NGINX}/dist
+	${DC} -f ${DC_FILE}-build.yml up --build
+	@sudo rsync -avz --delete ${FRONTEND}/dist/. ${NGINX}/dist/.
 	@echo "${commit}" > ${FRONTEND}/.lastcommit
 endif
 
