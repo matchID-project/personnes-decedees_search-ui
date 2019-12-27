@@ -65,7 +65,7 @@ services:
       - ${FRONTEND}/public:/${APP}/public
       - ${FRONTEND}/.eslintrc.js:/${APP}/.eslintrc.js
       - ${FRONTEND}/src:/${APP}/src/
-      - ${FRONTEND}/build:/${APP}/build/
+      - ${FRONTEND}/dist-build:/${APP}/build/
       - /${APP}/node_modules
 
 networks:
