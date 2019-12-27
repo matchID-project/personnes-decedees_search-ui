@@ -19,6 +19,7 @@ services:
       - APP
       - FRONTEND_DEV_HOST
       - FRONTEND_DEV_PORT
+      - ES_PROXY_PATH
       - ES_HOST
       - ES_INDEX
       - ES_PORT
@@ -59,8 +60,7 @@ services:
     environment:
       - APP
       - PORT
-      - ES_PATH
-      - ES_INDEX
+      - ES_PROXY_PATH
     volumes:
       - ${FRONTEND}/public:/${APP}/public
       - ${FRONTEND}/.eslintrc.js:/${APP}/.eslintrc.js

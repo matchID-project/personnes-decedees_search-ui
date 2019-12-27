@@ -33,7 +33,7 @@ export GIT_BRANCH=dev
 # elasticsearch defaut configuration
 export ES_HOST = elasticsearch
 export ES_PORT = 9200
-export ES_PATH = /${APP}/api/v0
+export ES_PROXY_PATH = /${APP}/api/v0/search
 export ES_INDEX = deces
 
 dummy		    := $(shell touch artifacts)
@@ -107,7 +107,7 @@ frontend-dev-stop:
 
 dev: network frontend-stop frontend-dev
 
-dev-stop: frontend-dev-stop newtork-stop
+dev-stop: frontend-dev-stop
 
 frontend-build: network
 ifneq "$(commit)" "$(lastcommit)"
