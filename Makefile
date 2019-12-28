@@ -16,11 +16,11 @@ export FRONTEND := ${APP_PATH}
 export FRONTEND_DEV_HOST = frontend-development
 export FRONTEND_DEV_PORT = ${PORT}
 export NGINX = ${APP_PATH}/nginx
-export API_USER_LIMIT_RATE=1r/m
+export API_USER_LIMIT_RATE=5r/m
 export API_USER_BURST=20 nodelay
 export API_USER_SCOPE=http_x_forwarded_for
-export API_GLOBAL_LIMIT_RATE=10r/s
-export API_GLOBAL_BURST=50 nodelay
+export API_GLOBAL_LIMIT_RATE=20r/s
+export API_GLOBAL_BURST=200 nodelay
 
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
