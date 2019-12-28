@@ -17,10 +17,10 @@ export FRONTEND_DEV_HOST = frontend-development
 export FRONTEND_DEV_PORT = ${PORT}
 export NGINX = ${APP_PATH}/nginx
 export API_USER_LIMIT_RATE=1r/m
-export API_USER_BURST=3 nodelay
+export API_USER_BURST=20 nodelay
 export API_USER_SCOPE=http_x_forwarded_for
-export API_GLOBAL_LIMIT_RATE=5r/s
-export API_GLOBAL_BURST=20 nodelay
+export API_GLOBAL_LIMIT_RATE=10r/s
+export API_GLOBAL_BURST=50 nodelay
 
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
@@ -48,10 +48,11 @@ export APP_VERSION :=  ${commit}
 
 include /etc/os-release
 
+
 install-prerequisites:
 ifeq ("$(wildcard /usr/bin/envsubst)","")
-	sudo apt-get update; true
-	sudo apt install -y gettext; true
+	sudo apt-get update || true
+	sudo apt install -y gettext || true
 endif
 
 ifeq ("$(wildcard /usr/bin/docker)","")
