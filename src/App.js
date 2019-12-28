@@ -1,11 +1,22 @@
 import React from "react";
 
+import 'react-bulma-components/dist/react-bulma-components.min.css';
+
+import {
+  Button,
+  Heading,
+  Hero
+} from 'react-bulma-components';
+
+import CustomSearchBox from "./CustomSearchBox"
+
+import MatchIDHeader from "./MatchIDHeader"
+
 import {
   ErrorBoundary,
   Facet,
   SearchProvider,
   WithSearch,
-  SearchBox,
   Results,
   PagingInfo,
   ResultsPerPage,
@@ -54,22 +65,21 @@ const config = {
 
 export default function App() {
   return (
-    <SearchProvider config={config}>
+    <div>
+      <MatchIDHeader />
+      <SearchProvider config={config}>
       <WithSearch mapContextToProps={({ wasSearched }) => ({ wasSearched })}>
         {({ wasSearched }) => (
           <div className="App">
             <ErrorBoundary>
               <Layout
                 header={
-                  <SearchBox
-                    autocompleteMinimumCharacters={3}
-                    autocompleteResults={{
-                      sectionTitle: "Résultats",
-                      titleField: "title",
-                      clickThroughTags: ["test"]
-                    }}
-                    autocompleteSuggestions={true}
-                  />
+                  <Hero>
+                    <Heading class="title has-text-centered" style={{color: "#fff"}}> fichier des personnes décédées </Heading>
+                    <Heading class="subtitle is-small has-text-centered" style={{color: "#fff"}}> 24 millions d'enregistrements INSEE </Heading>
+                    <br/>
+                    <CustomSearchBox />
+                  </Hero>
                 }
                 sideContent={
                   <div>
@@ -123,5 +133,6 @@ export default function App() {
         )}
       </WithSearch>
     </SearchProvider>
+    </div>
   );
 }
