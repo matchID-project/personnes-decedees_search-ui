@@ -1,15 +1,5 @@
 import React from "react";
 
-import 'react-bulma-components/dist/react-bulma-components.min.css';
-
-import {
-  Button,
-  Heading,
-  Hero
-} from 'react-bulma-components';
-
-import CustomSearchBox from "./CustomSearchBox"
-
 import MatchIDHeader from "./MatchIDHeader"
 
 import {
@@ -30,6 +20,7 @@ import buildRequest from "./buildRequest";
 import runRequest from "./runRequest";
 import applyDisjunctiveFaceting from "./applyDisjunctiveFaceting";
 import buildState from "./buildState";
+import SearchHeader from "./SearchHeader";
 
 const config = {
   debug: true,
@@ -73,21 +64,7 @@ export default function App() {
           <div className="App">
             <ErrorBoundary>
               <Layout
-                header={
-                  <Hero>
-                    <Heading className="title has-text-centered" style={{color: "#fff"}}>
-                      fichier des décès
-                    </Heading>
-                    <Heading className="subtitle is-small has-text-centered" style={{color: "#fff"}}>
-                      <a
-                        href="https://www.insee.fr/fr/information/4190491"
-                        className="is-white"
-                      > source INSEE </a>
-                    </Heading>
-                    <br/>
-                    <CustomSearchBox setSearchTerm={setSearchTerm}/>
-                  </Hero>
-                }
+                header={SearchHeader(setSearchTerm)}
 
                 bodyContent={
                   <Results
