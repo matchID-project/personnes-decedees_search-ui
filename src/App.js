@@ -68,8 +68,8 @@ export default function App() {
     <div>
       <MatchIDHeader />
       <SearchProvider config={config}>
-      <WithSearch mapContextToProps={({ wasSearched }) => ({ wasSearched })}>
-        {({ wasSearched }) => (
+      <WithSearch mapContextToProps={({ setSearchTerm, wasSearched }) => ({ setSearchTerm, wasSearched })}>
+        {({ setSearchTerm, wasSearched }) => (
           <div className="App">
             <ErrorBoundary>
               <Layout
@@ -78,7 +78,7 @@ export default function App() {
                     <Heading class="title has-text-centered" style={{color: "#fff"}}> fichier des personnes décédées </Heading>
                     <Heading class="subtitle is-small has-text-centered" style={{color: "#fff"}}> 24 millions d'enregistrements INSEE </Heading>
                     <br/>
-                    <CustomSearchBox />
+                    <CustomSearchBox setSearchTerm={setSearchTerm}/>
                   </Hero>
                 }
                 sideContent={
