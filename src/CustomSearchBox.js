@@ -4,7 +4,7 @@ import 'react-bulma-components/dist/react-bulma-components.min.css';
 
 import {
   Button,
-  Table,
+  Columns,
   Container
 } from 'react-bulma-components';
 
@@ -19,22 +19,28 @@ export default function CustomSearchBox(setSearchTerm) {
         autocompleteSuggestions={true}
         autocompleteView={CustomAutocompleteView}
         inputView={({ getAutocomplete, getInputProps }) => (
-        <>
-            <div className="sui-search-box__wrapper" >
-            <input style={{height: "3.25em"}}
-                {...getInputProps({
-                placeholder: "prénom, nom, date de naissance ou de décès, ... e.g. Georges Pompidou"
-                })}
-            />
-            {getAutocomplete()}
-            </div>
-            <Button
-              className="is-size-5"
-              color="info"
-            >
-              Recherche
-            </Button>
-        </>
+          <Container className="column is-6">
+            <Columns>
+              <Columns.Column size={9}>
+                <input
+                    {...getInputProps({
+                    placeholder: "prénom, nom, date de naissance ou de décès, ... e.g. Georges Pompidou"
+                    })}
+                    className="is-size-5 is-fullwidth"
+                    style={{height: "2.35em",width:"100%"}}
+                />
+                {getAutocomplete()}
+              </Columns.Column>
+              <Columns.Column size={3}>
+                <Button
+                  className="is-size-5 is-fullwidth"
+                  color="info"
+                >
+                  Recherche
+                </Button>
+              </Columns.Column>
+            </Columns>
+          </Container>
       )}
       onSelectAutocomplete={(selection) => {
         setSearchTerm.setSearchTerm(selection.PRENOM.raw + " " + selection.NOM.raw + " " +

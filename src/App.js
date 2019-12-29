@@ -75,44 +75,20 @@ export default function App() {
               <Layout
                 header={
                   <Hero>
-                    <Heading class="title has-text-centered" style={{color: "#fff"}}> fichier des personnes décédées </Heading>
-                    <Heading class="subtitle is-small has-text-centered" style={{color: "#fff"}}> 24 millions d'enregistrements INSEE </Heading>
+                    <Heading className="title has-text-centered" style={{color: "#fff"}}>
+                      fichier des décès
+                    </Heading>
+                    <Heading className="subtitle is-small has-text-centered" style={{color: "#fff"}}>
+                      <a
+                        href="https://www.insee.fr/fr/information/4190491"
+                        className="is-white"
+                      > source INSEE </a>
+                    </Heading>
                     <br/>
                     <CustomSearchBox setSearchTerm={setSearchTerm}/>
                   </Hero>
                 }
-                sideContent={
-                  <div>
-                    {/* {wasSearched && (
-                      <Sorting
-                        label={"Sort by"}
-                        sortOptions={[
-                          {
-                            name: "Relevance",
-                            value: "",
-                            direction: ""
-                          },
-                          {
-                            name: "NOM",
-                            value: "Nom",
-                            direction: "asc"
-                          }
-                        ]}
-                      />
-                    )} */}
-                    <Facet
-                      field="PAYS_NAISSANCE"
-                      label="Pays de naissance"
-                      filterType="any"
-                      isFilterable={true}
-                    />
-                    <Facet
-                      field="COMMUNE_NAISSANCE"
-                      label="Commune de naissance"
-                      filterType="any"
-                      isFilterable={true}                    />
-                  </div>
-                }
+
                 bodyContent={
                   <Results
                     titleField="title"
