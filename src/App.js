@@ -21,6 +21,7 @@ import runRequest from "./runRequest";
 import applyDisjunctiveFaceting from "./applyDisjunctiveFaceting";
 import buildState from "./buildState";
 import SearchHeader from "./SearchHeader";
+import CustomResults from "./CustomResults";
 
 const config = {
   debug: true,
@@ -59,26 +60,22 @@ export default function App() {
     <div>
       <MatchIDHeader />
       <SearchProvider config={config}>
-      <WithSearch mapContextToProps={({ setSearchTerm, wasSearched }) => ({ setSearchTerm, wasSearched })}>
-        {({ setSearchTerm, wasSearched }) => (
+      <WithSearch mapContextToProps={({ setSearchTerm, wasSearched, results }) => ({ setSearchTerm, wasSearched, results })}>
+        {({ setSearchTerm, wasSearched, results }) => (
           <div className="App">
             <ErrorBoundary>
               <Layout
                 header={SearchHeader(setSearchTerm)}
 
-                bodyContent={
-                  <Results
-                    titleField="title"
-                    urlField="COMMUNE_NAISSANCE"
-                    shouldTrackClickThrough={true}
-                  />
-                }
+                bodyContent={CustomResults(results)}
+
                 bodyHeader={
                   <React.Fragment>
                     {wasSearched && <PagingInfo />}
                     {wasSearched && <ResultsPerPage />}
                   </React.Fragment>
                 }
+
                 bodyFooter={<Paging />}
               />
             </ErrorBoundary>
