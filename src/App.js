@@ -15,6 +15,7 @@ import {
 } from "@elastic/react-search-ui";
 import { Layout, SingleSelectFacet } from "@elastic/react-search-ui-views";
 import "@elastic/react-search-ui-views/lib/styles/styles.css";
+import "./App.css";
 
 import buildRequest from "./buildRequest";
 import runRequest from "./runRequest";
@@ -68,7 +69,7 @@ export default function App() {
                 header={SearchHeader(setSearchTerm)}
 
                 bodyContent={CustomResults(results)}
-
+                sideContent={null}
                 bodyHeader={
                   <React.Fragment>
                     {wasSearched && <PagingInfo />}
