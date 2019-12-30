@@ -118,7 +118,8 @@ ifneq "$(commit)" "$(lastcommit)"
 	@echo building ${APP} search-ui frontend after new commit ${APP_VERSION}
 	@make clean
 	@sudo mkdir -p ${NGINX}/dist
-	${DC} -f ${DC_FILE}-build.yml up --build
+	${DC} -f ${DC_FILE}-build.yml build --no-cache
+	${DC} -f ${DC_FILE}-build.yml up
 	@sudo rsync -avz --delete ${FRONTEND}/dist/. ${NGINX}/dist/.
 	@echo "${commit}" > ${FRONTEND}/.lastcommit
 endif

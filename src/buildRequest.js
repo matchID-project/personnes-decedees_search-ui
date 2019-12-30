@@ -51,13 +51,11 @@ function buildMatch(searchTerm) {
                     ],
                     should: [
                       {
-                        span_first: {
-                          match: {
-                            span_term: {
-                              PRENOMS: names[1]
-                            }
-                          },
-                          end: 1
+                        match: {
+                          PRENOM: {
+                            query: names[1],
+                            fuzziness: "auto"
+                          }
                         }
                       }
                     ]
@@ -91,14 +89,11 @@ function buildMatch(searchTerm) {
                     ],
                     should: [
                       {
-                        span_first: {
-                          match: {
-                            span_term: {
-                              PRENOMS: names[0]
-                            }
-                          },
-
-                          end: 1
+                        match: {
+                          PRENOM: {
+                            query: names[0],
+                            fuzziness: "auto"
+                          }
                         }
                       }
                     ]
@@ -115,7 +110,7 @@ function buildMatch(searchTerm) {
       multi_match : {
         query:      names.join(" "),
         type:       "cross_fields",
-        fields:     [ "NOM", "PRENOMS" ],
+        fields:     [ "NOM", "PRENOM" ],
         operator:   "and"
       }
     }
@@ -219,7 +214,7 @@ export default function buildRequest(state) {
       "COMMUNE_DECES","COMMUNE_NAISSANCE",
       "DATE_DECES","DATE_NAISSANCE",
       "DEPARTEMENT_DECES","DEPARTEMENT_NAISSANCE",
-      "NOM","PRENOMS",
+      "NOM","PRENOM","PRENOMS",
       "NUM_DECES",
       "PAYS_DECES","PAYS_DECES_CODEISO3",
       "PAYS_NAISSANCE","PAYS_NAISSANCE_CODEISO3",
