@@ -25,23 +25,23 @@ export default function CustomResults(results) {
                 results.map((result, i) => (
                   <Columns.Column size={12}>
                     <Card>
-                        <Card.Header>
-                            <Media>
-                                <Media.Item renderAs="figure" position="left">
+                        <Card.Header className="has-background-primary">
+                            <Columns className="is-vcentered is-mobile">
+                                <Columns.Column size={3}>
                                     <Image
                                         size={64} alt="64x64"
                                         src={ result.SEXE.raw === 'M' ? '/male.svg' : '/female.svg' }
                                     />
-                                </Media.Item>
-                                <Media.Item>
-                                    <Heading size={4}>{result.PRENOM.raw} {result.NOM.raw}</Heading>
-                                    <Heading subtitle size={6}>
-                                       {result.DATE_NAISSANCE.raw.replace(/(\d{4})(\d{2})(\d{2})/,"$3/$2/$1")}
-                                       &nbsp; - &nbsp;
-                                       {result.DATE_DECES.raw.replace(/(\d{4})(\d{2})(\d{2})/,"$3/$2/$1")}
+                                </Columns.Column>
+                                <Columns.Column size={9} >
+                                    <Heading size={4} className="has-text-white">{result.PRENOM.raw} {result.NOM.raw}</Heading>
+                                    <Heading subtitle size={6} className="has-text-white">
+                                        {result.DATE_NAISSANCE.raw.replace(/(\d{4})(\d{2})(\d{2})/,"$3/$2/$1")}
+                                        &nbsp; - &nbsp;
+                                        {result.DATE_DECES.raw.replace(/(\d{4})(\d{2})(\d{2})/,"$3/$2/$1")}
                                     </Heading>
-                                </Media.Item>
-                            </Media>
+                                </Columns.Column>
+                            </Columns>
                         </Card.Header>
                         <Card.Content>
                             <Content>

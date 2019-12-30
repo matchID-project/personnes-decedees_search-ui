@@ -20,7 +20,7 @@ export default function CustomSearchBox(setSearchTerm) {
         autocompleteView={CustomAutocompleteView}
         inputView={({ getAutocomplete, getInputProps }) => (
           <Container className="column is-6" style={{"margin-top": "-15px"}}>
-            <Columns>
+            <Columns className="is-vcentered">
               <Columns.Column size={9}>
                 <input
                     {...getInputProps({
