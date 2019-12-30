@@ -19,7 +19,7 @@ export default function CustomSearchBox(setSearchTerm) {
         autocompleteSuggestions={true}
         autocompleteView={CustomAutocompleteView}
         inputView={({ getAutocomplete, getInputProps }) => (
-          <Container className="column is-6">
+          <Container className="column is-6" style={{"margin-top": "-15px"}}>
             <Columns>
               <Columns.Column size={9}>
                 <input

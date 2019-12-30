@@ -21,7 +21,6 @@ export default function SearchHeader(setSearchTerm) {
             className="is-white"
           > source INSEE </a>
         </Heading>
-        <br/>
         <CustomSearchBox setSearchTerm={setSearchTerm}/>
       </Hero>
     )
