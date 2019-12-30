@@ -17,17 +17,19 @@ function CustomAutocompleteView({
   let index = 0;
   return (
     <div className="sui-search-box__autocomplete-container">
-      <Container style={{"margin-left": "15px", "margin-top": "-20px"}} className="is-widescreen">
+      <Container style={{marginLeft: "15px", marginTop: "-20px"}} className="is-widescreen">
         <span className="is-uppercase is-size-7 is-small has-text-grey">
           Résultats
         </span>
 
         <Table className="is-narrow">
-            <tr className="is-uppercase is-size-7 is-small has-text-grey">
-              <td> Prénom Nom </td>
-              <td> Naissance </td>
-              <td> Décès </td>
+          <thead>
+            <tr className="is-uppercase">
+              <td className="is-size-7 is-small has-text-grey"> Prénom Nom </td>
+              <td className="is-size-7 is-small has-text-grey"> Naissance </td>
+              <td className="is-size-7 is-small has-text-grey"> Décès </td>
             </tr>
+          </thead>
           <tbody>
             {!!autocompletedResults && autocompletedResults.map((result, i) => (
               <tr className="is-size-7 is-hoverable"
