@@ -15,7 +15,7 @@ function buildMatch(searchTerm) {
   searchTerm = searchTerm ? searchTerm.normalize('NFKD').replace(/[\u0300-\u036f]/g, "").split(/\s+/) : []
   let date = searchTerm.filter( x => x.match(/^\d{2}\/\d{2}\/\d{4}$/)).map( x => x.replace(/(\d{2})\/(\d{2})\/(\d{4})/,"$3$2$1"));
   date = date.length ? date[0] : null;
-  let names = searchTerm.filter( x => x.match(/[a-z]+/)).filter( x => !x.match(/(el|le|de|la|los)/))
+  let names = searchTerm.filter( x => x.match(/[a-z]+/)).filter( x => !x.match(/^(el|le|de|la|los)$/))
 
   const default_query = { match_all: {} }
   let names_query
