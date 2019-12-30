@@ -11,4 +11,4 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Build with node and build nginx docker image
-      run: make build
+      run: /usr/bin/make build up
