@@ -20,8 +20,10 @@ export default function CustomResults(results) {
     console.log("results", results)
     return(
         <Container>
+          <Columns>
             { !!results &&
                 results.map((result, i) => (
+                  <Columns.Column size={12}>
                     <Card>
                         <Card.Header>
                             <Media>
@@ -104,8 +106,10 @@ export default function CustomResults(results) {
                             </Content>
                         </Card.Content>
                     </Card>
+                  </Columns.Column>
                 ))
             }
+          </Columns>
         </Container>
     )
 }
