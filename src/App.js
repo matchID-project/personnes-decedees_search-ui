@@ -56,34 +56,59 @@ const config = {
   }
 };
 
-export default function App() {
-  return (
-    <div>
-      <MatchIDHeader />
-      <SearchProvider config={config}>
-      <WithSearch mapContextToProps={({ setSearchTerm, wasSearched, results }) => ({ setSearchTerm, wasSearched, results })}>
-        {({ setSearchTerm, wasSearched, results }) => (
-          <div className="App">
-            <ErrorBoundary>
-              <Layout
-                header={SearchHeader(setSearchTerm)}
+class App extends React.Component {
+  constructor(props) {
+    super(props);
 
-                bodyContent={CustomResults(results)}
-                sideContent={null}
-                bodyHeader={
-                  <React.Fragment>
-                    {wasSearched && <PagingInfo />}
-                    {wasSearched && <ResultsPerPage />}
-                  </React.Fragment>
-                }
+    this.state = {
+      modalState: false
+    };
 
-                bodyFooter={<Paging />}
-              />
-            </ErrorBoundary>
-          </div>
-        )}
-      </WithSearch>
-    </SearchProvider>
-    </div>
-  );
+    this.toggleModal = this.toggleModal.bind(this);
+  }
+
+  toggleModal() {
+    this.setState((prev, props) => {
+      const newState = ! prev.modalState;
+
+      return { modalState: newState };
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <MatchIDHeader
+          toggleModal={this.toggleModal}
+          modalState={this.state.modalState}
+        />
+        <SearchProvider config={config}>
+        <WithSearch mapContextToProps={({ setSearchTerm, wasSearched, results }) => ({ setSearchTerm, wasSearched, results })}>
+          {({ setSearchTerm, wasSearched, results }) => (
+            <div className="App">
+              <ErrorBoundary>
+                <Layout
+                  header={SearchHeader(setSearchTerm)}
+
+                  bodyContent={CustomResults(results)}
+                  sideContent={null}
+                  bodyHeader={
+                    <React.Fragment>
+                      {wasSearched && <PagingInfo />}
+                      {wasSearched && <ResultsPerPage />}
+                    </React.Fragment>
+                  }
+
+                  bodyFooter={<Paging />}
+                />
+              </ErrorBoundary>
+            </div>
+          )}
+        </WithSearch>
+      </SearchProvider>
+      </div>
+    );
+  }
 }
+
+export default App;
