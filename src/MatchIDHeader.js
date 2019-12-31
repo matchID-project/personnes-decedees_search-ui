@@ -81,6 +81,14 @@ export default function MatchIDHeader({toggleModal, modalState}) {
                     </Modal.Card.Head>
                     <Modal.Card.Body>
                         <Content>
+                        <p><strong>Conditions d'usage et garanties (version alpha)</strong></p>
+                            <p>
+                                Ce service est financé sur fonds personnels et est donc offert sans garantie.
+                                L'usage est limité à une requête par seconde afin de préserver un service pour tous. Selon
+                                l'affluence et les retours, nous envisagerons de le consolider. Contactez nous
+                                sur <a href="mailto:matchid.project@gmail.com">matchid-project@gmail.com</a> pour
+                                toute question ou signaler un problème.
+                            </p>
                             <p><strong>Fichier des personnes décédées</strong></p>
                             <p>
                                 Ce service vise à permettre la recherche directe de personnes décédées. Il exploite la base opendata
@@ -88,10 +96,10 @@ export default function MatchIDHeader({toggleModal, modalState}) {
                                 diffusée par <a href="https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/">data.gouv.fr</a>.
                             </p>
                             <p>
-                                Ce service utilise l'intégralité des données, soit environ 25 millions d'enregistrements.
-                                Il concerne les déclarations de décès à l'INSEE depuis 1970 jusqu'au mois précédent. Il concerne
-                                les personnes ayant un numéro INSEE et ayant fait l'objet d'une déclaration de décès, en mairie ou
-                                en consulat. Le délai de déclaration et de transmission peut être variable (personnes disparues, ou
+                                Ce service utilise l'intégralité des données INSEE, soit environ 25 millions d'enregistrements.
+                                Il concerne les déclarations de décès retransmises vers l'INSEE depuis 1970 jusqu'au mois précédent.
+                                Seules les personnes ayant eu un numéro INSEE et ayant fait l'objet d'une déclaration de décès, en mairie ou
+                                en consulat sont enregistrées. Le délai de déclaration et de transmission peut être variable (personnes disparues, ou
                                 recherches historiques e.g. identifications tardives après guerre).
                             </p>
                             <p><strong>Traitement des données avec matchID</strong></p>
@@ -117,13 +125,6 @@ export default function MatchIDHeader({toggleModal, modalState}) {
                                 matchID. Le projet a été libéré et mis en opensource. Nous avons créé de service
                                 en complément qui semblait d'utilité notamment pour la lutte contre la fraude.
                                 Pour en savoir plus sur le projet matchID, suivez ce <a href="https://matchid.io">lien</a>.
-                            </p>
-                            <p><strong>Conditions d'usage et garanties</strong></p>
-                            <p>
-                                Ce service est financé sur fonds personnels et est donc offert sans garantie. L'usage est limité à une requête
-                                par seconde afin de préserver un service pour tous. Selon
-                                l'affluence et les retours, nous envisagerons de le consolider. Contactez nous
-                                sur <a href="mailto:matchid@matchid.io">matchid@matchid.io</a>
                             </p>
                         </Content>
                     </Modal.Card.Body>
