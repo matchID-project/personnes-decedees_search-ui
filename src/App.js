@@ -47,12 +47,13 @@ const config = {
     // Note that this could be optimized by running all of these requests
     // at the same time. Kept simple here for clarity.
     const responseJson = await runRequest(requestBody);
-    const responseJsonWithDisjunctiveFacetCounts = await applyDisjunctiveFaceting(
-      responseJson,
-      state,
-      ["PAYS_NAISSANCE", "COMMUNE_NAISSANCE"]
-    );
-    return buildState(responseJsonWithDisjunctiveFacetCounts, resultsPerPage);
+    // const responseJsonWithDisjunctiveFacetCounts = await applyDisjunctiveFaceting(
+    //   responseJson,
+    //   state,
+    //   ["PAYS_NAISSANCE", "COMMUNE_NAISSANCE"]
+    // );
+    return buildState(responseJson, resultsPerPage);
+    // return buildState(responseJsonWithDisjunctiveFacetCounts, resultsPerPage);
   }
 };
 
