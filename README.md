@@ -1,61 +1,40 @@
-# Search UI + Elasticsearch Example
+# Conditions d'usage et garanties (version alpha)
 
-https://search-ui-stable-elasticsearch.netlify.com/
+Ce service est financé sur fonds personnels et est donc offert sans garantie.
+L'usage est limité à une requête par seconde afin de préserver un service pour tous. Selon
+l'affluence et les retours, nous envisagerons de le consolider. Contactez nous
+sur <a href="mailto:matchid.project@gmail.com">matchid-project@gmail.com</a> pour
+toute question ou signaler un problème.
 
-## About
+# Fichier des personnes décédées
+Ce service vise à permettre la recherche directe de personnes décédées. Il exploite la base opendata
+délivrée par l'<a href="https://www.insee.fr/fr/information/4190491">INSEE</a> et
+diffusée par <a href="https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/">data.gouv.fr</a>.
 
-This is an example of Search UI using Elasticsearch as a Search API.
+Ce service utilise l'intégralité des données INSEE, soit environ 25 millions d'enregistrements.
+Il concerne les déclarations de décès retransmises vers l'INSEE depuis 1970 jusqu'au mois précédent.
+Seules les personnes ayant eu un numéro INSEE et ayant fait l'objet d'une déclaration de décès, en mairie ou
+en consulat sont enregistrées. Le délai de déclaration et de transmission peut être variable (personnes disparues, ou
+recherches historiques e.g. identifications tardives après guerre).
 
-As noted elsewhere, when using Elasticsearch as a Search API, no Connector is available, so we need to write Handlers ourselves.
-This process is described in the [Connectors and Handlers](../../ADVANCED.md#connectors-and-handlers) section of the Advanced
-guide.
+# Traitement des données avec matchID
+Les données sont traitées avec l'outil opensource <a href="https://matchid.io">matchID</a> (Python/Pandas). Les traitements, disponibles
+disponibles <a href="https://github.com/matchid-project/personnes-decedees_search">ici</a>,
+consistent en une mise en forme (capitalisation, réconciliation avec les noms de pays et commune
+selon les référentiels INSEE) puis une indexation. Les données sont actualisées chaque mois, après chaque diffusion sur le
+site <a href="https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/">data.gouv.fr</a>.
 
-This takes a bit more effort than using a Connector, but it provides a lot of flexibility. This example
-should give Elasticsearch users a bit of a head start when using Search UI.
+La recherche et l'indexation reposent sur <a href="https://elastic.co">Elasticsearch</a>
+qui repose sur le moteur de recherche Lucène, qui apporte le bénéfice
+des <a href="https://wikipedia.org/wiki/Recherche_approximative">recherches floues</a> à
+large échelle. La visualisation est basée
+sur <a href="https://swiftype.com/search-ui">Search-UI</a>.
+Le code source est accessible sur <a href="https://github.com/matchid-project/personnes-decedees_search-ui">Github</a>.
 
-### What the Handlers actually do
-
-The Handlers in this project convert [Application State to Elasticsearch requests](src/buildRequest.js), and then [Elasticsearch responses back to Application State](src/buildState.js).
-
-## Setup
-
-### Setup Elasticsearch
-
-To get this project working, you'll first need to have an Elasticsearch instance set up and data indexed.
-
-The National Parks data set that this project uses can be found in `/data`. That data should be indexed into an Elasticsearch index named "national-parks".
-
-If you do not yet have Elasticsearch installed, you can download and [install an instance locally](https://www.elastic.co/products/elasticsearch), or
-create a deployment on [Elastic Cloud](https://www.elastic.co/cloud/).
-
-### Setup this project
-
-Just clone the project and run the following in this directory:
-
-```
-npm install
-```
-
-### Run
-
-Run the following command, filling in the variables below with your own Elasticsearch credentials and host.
-
-```
-ELASTICSEARCH_HOST=https://{user}:{password}@{elasticsearch_url} npm start
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-## Always proxy your Elasticsearch instance
-
-It is **never** recommended to directly query your Elasticsearch index from a browser.
-
-This project includes a [Netlify Function](https://www.netlify.com/docs/functions/) which proxies your Elasticsearch.
-
-## Deployment
-
-This project is meant to be deployed to Netlify.
-
-A `netlify.toml` file is included with all of the configuration you'll need to deploy it to Netlify.
-
-You'll additionally need to configure `ELASTICSEARCH_HOST` as an environment variable.
+# Qui sommes nous ?
+Le projet matchID a été initié au ministère de l'Intérieur dans le contexte des
+challenges d'<a href="https://entrepreneur-interet-general.etalab.gouv.fr/defis/2017/mi-matchid.html">Entrepreneur d'intérêt général</a>.
+La réconciliation des personnes décédées avec le permis de conduire a été le premier cas d'usage réalisé avec
+matchID. Le projet a été libéré et mis en opensource. Nous avons créé de service
+en complément qui semblait d'utilité notamment pour la lutte contre la fraude.
+Pour en savoir plus sur le projet matchID, suivez ce <a href="https://matchid.io">lien</a>.
