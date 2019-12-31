@@ -30,11 +30,24 @@ function buildMatch(searchTerm) {
             bool: {
               must: [
                 {
-                  match: {
-                    NOM: {
-                      query: names[0],
-                      fuzziness: "auto"
-                    }
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          NOM: {
+                            query: names[0],
+                            fuzziness: "auto"
+                          }
+                        }
+                      }
+                    ],
+                    should: [
+                      {
+                        match: {
+                          NOM: names[0]
+                        }
+                      }
+                    ]
                   }
                 },
                 {
@@ -56,6 +69,11 @@ function buildMatch(searchTerm) {
                             query: names[1],
                             fuzziness: "auto"
                           }
+                        }
+                      },
+                      {
+                        match: {
+                          PRENOM: names[1]
                         }
                       }
                     ]
@@ -68,11 +86,24 @@ function buildMatch(searchTerm) {
             bool: {
               must: [
                 {
-                  match: {
-                    NOM: {
-                      query: names[1],
-                      fuzziness: "auto"
-                    }
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          NOM: {
+                            query: names[1],
+                            fuzziness: "auto"
+                          }
+                        }
+                      }
+                    ],
+                    should: [
+                      {
+                        match: {
+                          NOM: names[1]
+                        }
+                      }
+                    ]
                   }
                 },
                 {
@@ -94,6 +125,11 @@ function buildMatch(searchTerm) {
                             query: names[0],
                             fuzziness: "auto"
                           }
+                        }
+                      },
+                      {
+                        match: {
+                          PRENOM: names[0]
                         }
                       }
                     ]
