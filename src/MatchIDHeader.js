@@ -74,7 +74,7 @@ export default function MatchIDHeader({toggleModal, modalState}) {
             </Navbar>
             <Modal show={modalState} onClose={toggleModal}>
                 <Modal.Card>
-                    <Modal.Card.Head>
+                    <Modal.Card.Head onClose={toggleModal}>
                         <Modal.Card.Title>
                             À propos de ce service
                         </Modal.Card.Title>
@@ -121,7 +121,7 @@ export default function MatchIDHeader({toggleModal, modalState}) {
                             <p><strong>Conditions d'usage et garanties</strong></p>
                             <p>
                                 Ce service est financé sur fonds personnels et est donc offert sans garantie. L'usage est limité à une requête
-                                par seconde afin de préserver l'état du serveur. Selon
+                                par seconde afin de préserver un service pour tous. Selon
                                 l'affluence et les retours, nous envisagerons de le consolider. Contactez nous
                                 sur <a href="mailto:matchid@matchid.io">matchid@matchid.io</a>
                             </p>
