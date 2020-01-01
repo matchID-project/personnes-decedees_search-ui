@@ -91,7 +91,6 @@ class App extends React.Component {
 
     this.setState((prev, props) => {
       const newState = ! prev.burgerState;
-      console.log("burgerState",newState);
       return { burgerState: newState };
     })
   }

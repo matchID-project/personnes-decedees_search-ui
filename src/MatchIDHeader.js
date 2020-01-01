@@ -36,11 +36,11 @@ export default function MatchIDHeader({toggleModal, modalState, toggleBurger, bu
             >
                 <Container>
                     <Navbar.Brand>
-                        <Navbar.Item renderAs="a" href="#" class="logo">
+                        <Navbar.Item class="logo" onClick={toggleModal}>
                             <img src={process.env.PUBLIC_URL + "/matchID-logo.svg"} alt="matchID Logo" />
                         </Navbar.Item>
                         <Navbar.Burger
-                            onClick={() => {toggleBurger();console.log(burgerState)}}
+                            onClick={toggleBurger}
                             data-target="navMenu" aria-label="menu" aria-expanded="false"
                         >
                             <span aria-hidden="true"></span>
