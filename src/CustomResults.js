@@ -17,7 +17,6 @@ import {
 import { Results } from "@elastic/react-search-ui";
 
 export default function CustomResults(results) {
-    console.log("results", results)
     return(
         <Container>
           <Columns>

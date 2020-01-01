@@ -26,7 +26,7 @@ import {
     faUsb
 } from '@fortawesome/free-brands-svg-icons';
 
-export default function MatchIDHeader({toggleModal, modalState}) {
+export default function MatchIDHeader({toggleModal, modalState, toggleBurger, burgerState}) {
     return (
         <>
             <Navbar
@@ -39,11 +39,19 @@ export default function MatchIDHeader({toggleModal, modalState}) {
                         <Navbar.Item renderAs="a" href="#" class="logo">
                             <img src={process.env.PUBLIC_URL + "/matchID-logo.svg"} alt="matchID Logo" />
                         </Navbar.Item>
-                        <Navbar.Burger>
+                        <Navbar.Burger
+                            onClick={() => {toggleBurger();console.log(burgerState)}}
+                            data-target="navMenu" aria-label="menu" aria-expanded="false"
+                        >
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
                         </Navbar.Burger>
                     </Navbar.Brand>
 
-                    <Navbar.Menu>
+                    <Navbar.Menu
+                        id="navMenu"
+                    >
                         <Navbar.Container>
                             <Navbar.Item onClick={toggleModal}>
                                 &nbsp; à propos de ce service

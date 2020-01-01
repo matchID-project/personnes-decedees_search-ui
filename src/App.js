@@ -62,10 +62,12 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      modalState: false
+      modalState: false,
+      burgerState: false
     };
 
     this.toggleModal = this.toggleModal.bind(this);
+    this.toggleBurger = this.toggleBurger.bind(this);
   }
 
   toggleModal() {
@@ -76,12 +78,32 @@ class App extends React.Component {
     })
   }
 
+  toggleBurger() {
+    const navbarBurger = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0)[0];
+
+    // Get the target from the "data-target" attribute
+    const target = navbarBurger.dataset.target;
+    const $target = document.getElementById(target);
+
+    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+    navbarBurger.classList.toggle('is-active');
+    $target.classList.toggle('is-active');
+
+    this.setState((prev, props) => {
+      const newState = ! prev.burgerState;
+      console.log("burgerState",newState);
+      return { burgerState: newState };
+    })
+  }
+
   render() {
     return (
       <div>
         <MatchIDHeader
           toggleModal={this.toggleModal}
           modalState={this.state.modalState}
+          toggleBurger={this.toggleBurger}
+          burgerState={this.state.burgerState}
         />
         <SearchProvider config={config}>
         <WithSearch mapContextToProps={({ setSearchTerm, wasSearched, results }) => ({ setSearchTerm, wasSearched, results })}>
