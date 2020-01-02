@@ -120,10 +120,13 @@ dev: network frontend-stop frontend-dev
 
 dev-stop: frontend-dev-stop
 
-build: nginx-build
+build: frontend-build nginx-build
 
 build-dir:
 	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
+
+build-dir-clean:
+	if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
 
 ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION):
 	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
