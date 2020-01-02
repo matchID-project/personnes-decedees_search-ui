@@ -95,12 +95,12 @@ ARG app_ver
 ENV APP ${app_name}
 ENV APP_VERSION ${app_ver}
 
-VOLUME /$app_path/build
+# VOLUME /$app_path/build
 
 COPY ${APP}-${APP_VERSION}-frontend.tar.gz .
 
 RUN  set -ex ; tar -zxvf ${APP}-${APP_VERSION}-frontend.tar.gz  && \
-     npm run build 2>&1 | tee npm.log; egrep -E '(ERROR|error)' npm.log && exit 1 ; rm -rf npm.log \
+     npm run build 2>&1 | tee npm.log; egrep -E '(ERROR|error)' npm.log && exit 1 ; rm -f npm.log \
      rm -rf ${app_name}-${app_ver}-frontend.tar.gz
 
 CMD ["npm", "run", "build"]
