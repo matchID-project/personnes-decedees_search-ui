@@ -26,12 +26,7 @@ services:
       - APP
       - PORT
       - ES_PROXY_PATH
-    volumes:
-      - ${FRONTEND}/public:/${APP}/public
-      - ${FRONTEND}/.eslintrc.js:/${APP}/.eslintrc.js
-      - ${FRONTEND}/src:/${APP}/src/
-      - ${FRONTEND}/dist:/${APP}/build/
-      - /${APP}/node_modules
+
 
 
 

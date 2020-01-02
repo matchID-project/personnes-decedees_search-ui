@@ -26,6 +26,7 @@ export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
 export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_NETWORK := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
+export DC_BUILD_ARGS = --pull --no-cache
 export DC := /usr/local/bin/docker-compose
 export GIT_ORIGIN=origin
 export GIT_BRANCH=dev
@@ -45,6 +46,13 @@ date                := $(shell date -I)
 id                  := $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 
 export APP_VERSION :=  ${commit}
+
+export FILE_FRONTEND_APP_VERSION = $(APP)-$(APP_VERSION)-frontend.tar.gz
+export FILE_FRONTEND_DIST_APP_VERSION = $(APP)-$(APP_VERSION)-frontend-dist.tar.gz
+export FILE_FRONTEND_DIST_LATEST_VERSION = $(APP)-latest-frontend-dist.tar.gz
+
+export DC_BUILD_FRONTEND = ${DC_FILE}-build.yml
+export BUILD_DIR=${APP_PATH}/${APP}-build
 
 include /etc/os-release
 
@@ -113,16 +121,37 @@ dev-stop: frontend-dev-stop
 
 build: frontend-build
 
-frontend-build: network
-ifneq "$(commit)" "$(lastcommit)"
-	@echo building ${APP} search-ui frontend after new commit ${APP_VERSION}
-	@make clean
-	@sudo mkdir -p ${NGINX}/dist
-	${DC} -f ${DC_FILE}-build.yml build --no-cache
-	${DC} -f ${DC_FILE}-build.yml up
-	@sudo rsync -avz --delete ${FRONTEND}/dist/. ${NGINX}/dist/.
-	@echo "${commit}" > ${FRONTEND}/.lastcommit
-endif
+build-dir:
+	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
+
+frontend-prepare-build:
+	if [ -f "${FRONTEND}/$(FILE_FRONTEND_APP_VERSION)" ] ; then rm -rf ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION) ; fi
+	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
+		.eslintrc.js \
+        src \
+        public )
+
+frontend-check-build:
+	${DC} -f $(DC_BUILD_FRONTEND) config -q
+
+frontend-build-dist: frontend-prepare-build frontend-check-build
+	@echo building ${APP} frontend in ${FRONTEND}
+	${DC} -f $(DC_BUILD_FRONTEND) build $(DC_BUILD_ARGS)
+
+frontend-build-dist-archive: build-dir
+	${DC} -f $(DC_BUILD_FRONTEND) run -T --rm frontend-build tar zCcf /$(APP)/build - . > $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION)
+	  cp $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION)
+	if [ -f $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) ]; then ls -alsrt  $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) && sha1sum $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) ; fi
+	if [ -f $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) ]; then ls -alsrt  $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) && sha1sum $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) ; fi
+
+frontend-build-all: network frontend-build-dist frontend-build-dist-archive
+
+frontend-clean-dist:
+	@rm -rf $(FILE_FRONTEND_APP_VERSION)
+
+frontend-clean-dist-archive:
+	@rm -rf $(FILE_FRONTEND_DIST_APP_VERSION)
+
 
 frontend-stop:
 	${DC} -f ${DC_FILE}.yml down
