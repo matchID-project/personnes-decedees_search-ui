@@ -10,7 +10,7 @@ SHELL=/bin/bash
 export PORT=8082
 
 #base paths
-export APP = search-ui
+export APP = personnes-decedees-search-ui
 export APP_PATH := $(shell pwd)
 export FRONTEND := ${APP_PATH}
 export FRONTEND_DEV_HOST = frontend-development
