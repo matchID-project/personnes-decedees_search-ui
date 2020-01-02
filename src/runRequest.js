@@ -1,7 +1,6 @@
 export default async function runRequest(body) {
-  const path = process.env.ES_PROXY_PATH;
 
-  const response = await fetch(`${process.env.APP}/api/v0/search`, {
+  const response = await fetch(`/personnes-decedees-search-ui/api/v0/search`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body)
