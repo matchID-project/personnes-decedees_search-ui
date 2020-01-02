@@ -63,7 +63,8 @@ class App extends React.Component {
 
     this.state = {
       modalState: false,
-      burgerState: false
+      burgerState: false,
+      errorMessage: false
     };
 
     this.toggleModal = this.toggleModal.bind(this);

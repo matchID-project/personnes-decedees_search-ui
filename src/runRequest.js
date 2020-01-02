@@ -5,5 +5,25 @@ export default async function runRequest(body) {
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body)
   });
-  return response.json();
+  if (response.status >= 400) {
+    return {
+      hits: {
+        total: {
+          value: 1
+        },
+        hits: [
+          {
+            _id: 0,
+            _source: {
+              status: response.status,
+              statusText: response.statusText,
+              error: true
+            }
+          }
+        ]
+      }
+    };
+  } else {
+    return response.json();
+  }
 }
