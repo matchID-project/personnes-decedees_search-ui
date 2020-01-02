@@ -52,6 +52,7 @@ export FILE_FRONTEND_DIST_APP_VERSION = $(APP)-$(APP_VERSION)-frontend-dist.tar.
 export FILE_FRONTEND_DIST_LATEST_VERSION = $(APP)-latest-frontend-dist.tar.gz
 
 export DC_BUILD_FRONTEND = ${DC_FILE}-build.yml
+export DC_RUN_NGINX_FRONTEND = ${DC_FILE}.yml
 export BUILD_DIR=${APP_PATH}/${APP}-build
 
 include /etc/os-release
@@ -119,13 +120,12 @@ dev: network frontend-stop frontend-dev
 
 dev-stop: frontend-dev-stop
 
-build: frontend-build
+build: nginx-build
 
 build-dir:
 	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
 
-frontend-prepare-build:
-	if [ -f "${FRONTEND}/$(FILE_FRONTEND_APP_VERSION)" ] ; then rm -rf ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION) ; fi
+${FRONTEND}/$(FILE_FRONTEND_APP_VERSION):
 	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
 		.eslintrc.js \
         src \
@@ -134,17 +134,17 @@ frontend-prepare-build:
 frontend-check-build:
 	${DC} -f $(DC_BUILD_FRONTEND) config -q
 
-frontend-build-dist: frontend-prepare-build frontend-check-build
+frontend-build-dist: ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION) frontend-check-build
 	@echo building ${APP} frontend in ${FRONTEND}
 	${DC} -f $(DC_BUILD_FRONTEND) build $(DC_BUILD_ARGS)
 
-frontend-build-dist-archive: build-dir
+$(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION): build-dir
 	${DC} -f $(DC_BUILD_FRONTEND) run -T --rm frontend-build tar zCcf /$(APP)/build - . > $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION)
 	  cp $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION)
 	if [ -f $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) ]; then ls -alsrt  $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) && sha1sum $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) ; fi
 	if [ -f $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) ]; then ls -alsrt  $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) && sha1sum $(BUILD_DIR)/$(FILE_FRONTEND_DIST_LATEST_VERSION) ; fi
 
-frontend-build-all: network frontend-build-dist frontend-build-dist-archive
+frontend-build: network frontend-build-dist $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION)
 
 frontend-clean-dist:
 	@rm -rf $(FILE_FRONTEND_APP_VERSION)
@@ -152,18 +152,25 @@ frontend-clean-dist:
 frontend-clean-dist-archive:
 	@rm -rf $(FILE_FRONTEND_DIST_APP_VERSION)
 
+nginx-check-build:
+	${DC} -f $(DC_RUN_NGINX_FRONTEND) config -q
+
+nginx-build: $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) nginx-check-build
+	@echo building ${APP} nginx
+	cp $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) nginx/
+	${DC} -f $(DC_RUN_NGINX_FRONTEND) build $(DC_BUILD_ARGS)
 
 frontend-stop:
 	${DC} -f ${DC_FILE}.yml down
 
-frontend: frontend-build
+frontend:
 	@echo docker-compose up ${APP} frontend
-	${DC} -f ${DC_FILE}.yml up -d
+	${DC} -f ${DC_RUN_NGINX_FRONTEND} up -d
 
 stop: frontend-stop
 	@echo all components stopped
 
-start: frontend-build frontend-stop frontend
+start: frontend
 	@sleep 2 && docker-compose logs
 
 up: start
