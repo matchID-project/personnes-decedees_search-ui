@@ -3,6 +3,7 @@ artifacts
 .lastcommit
 dist
 dist-build
+personnes-decedees-search-ui-*
 
 # dependencies
 /node_modules
