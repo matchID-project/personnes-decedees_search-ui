@@ -6,6 +6,9 @@
 ##############################################
 
 SHELL=/bin/bash
+
+export USE_TTY := $(shell test -t 1 && USE_TTY="-t")
+
 #search-ui
 export PORT=8082
 
