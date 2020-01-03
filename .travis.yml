@@ -26,11 +26,9 @@ before_script:
   - uname -a
   - type -a docker-compose && docker-compose version
   - docker version
-  - echo 'export DOCKER_USERNAME="$DOCKER_USERNAME"' > artifacts
-  - echo 'export DOCKER_PASSWORD="$DOCKER_PASSWORD"' >> artifacts
-  - cat artifacts
 
 script:
+  - env
   - git fetch --unshallow && git tag -l
   - make build docker-image
 
