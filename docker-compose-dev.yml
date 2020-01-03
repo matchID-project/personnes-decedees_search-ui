@@ -4,7 +4,7 @@ version: '3.4'
 
 services:
   nginx-development:
-    image: ${DC_PREFIX}-nginx-development:${APP_VERSION}
+    image: ${DOCKER_USERNAME}/${DC_PREFIX}-nginx-development:${APP_VERSION}
     build:
       context: ${NGINX}
       target: development
@@ -55,7 +55,7 @@ services:
         NPM_LATEST: ${NPM_LATEST}
         NPM_GIT: ${NPM_GIT}
         NPM_VERBOSE: ${NPM_VERBOSE}
-    image: ${DC_PREFIX}-frontend-development:${APP_VERSION}
+    image: ${DOCKER_USERNAME}/${DC_PREFIX}-frontend-development:${APP_VERSION}
     container_name: ${DC_PREFIX}-frontend-development
     environment:
       - APP

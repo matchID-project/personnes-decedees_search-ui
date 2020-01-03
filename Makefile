@@ -125,6 +125,15 @@ dev-stop: frontend-dev-stop
 
 build: frontend-build nginx-build
 
+docker-publish: docker-login
+	docker push ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
+
+docker-login:
+	echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+docker-pull:
+	docker pull ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
+
 build-dir:
 	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
 

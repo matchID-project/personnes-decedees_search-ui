@@ -4,7 +4,7 @@ version: '3.4'
 
 services:
   nginx:
-    image: ${DC_PREFIX}:${APP_VERSION}
+    image: ${DOCKER_USERNAME}/${DC_PREFIX}:${APP_VERSION}
     build:
       context: ${NGINX}
       target: production
