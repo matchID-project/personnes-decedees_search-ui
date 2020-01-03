@@ -125,7 +125,7 @@ dev-stop: frontend-dev-stop
 
 build: frontend-build nginx-build
 
-docker-push:
+docker-push: docker-login
 	docker push ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
 
 docker-login:
