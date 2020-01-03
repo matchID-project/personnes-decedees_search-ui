@@ -130,7 +130,7 @@ docker-push: docker-login
 	docker push ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
 
 docker-login:
-        @echo docker login for ${DOCKER_USERNAME}
+	@echo docker login for ${DOCKER_USERNAME}
 	@echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
 
 docker-pull:
