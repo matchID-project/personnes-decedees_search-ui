@@ -28,7 +28,6 @@ before_script:
   - docker version
 
 script:
-  - env
   - git fetch --unshallow && git tag -l
   - make build
 
