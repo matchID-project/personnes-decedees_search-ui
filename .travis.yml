@@ -28,6 +28,7 @@ before_script:
   - docker version
   - echo 'export DOCKER_USERNAME="$DOCKER_USERNAME"' > artifacts
   - echo 'export DOCKER_PASSWORD="$DOCKER_PASSWORD"' >> artifacts
+  - cat artifacts
 
 script:
   - git fetch --unshallow && git tag -l
