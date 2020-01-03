@@ -29,7 +29,7 @@ before_script:
 
 script:
   - git fetch --unshallow && git tag -l
-  - make build
+  - make build docker-image
 
 after_script:
   - make build-dir-clean
