@@ -11,144 +11,170 @@ function buildSort(sortDirection, sortField) {
   }
 }
 
-function buildMatch(searchTerm) {
+function buildMatch(searchTerm, autocomplete) {
   searchTerm = searchTerm ? searchTerm.normalize('NFKD').replace(/[\u0300-\u036f]/g, "").split(/\s+/) : []
   let date = searchTerm.filter( x => x.match(/^\d{2}\/\d{2}\/\d{4}$/)).map( x => x.replace(/(\d{2})\/(\d{2})\/(\d{4})/,"$3$2$1"));
   date = date.length ? date[0] : null;
-  let names = searchTerm.filter( x => x.match(/[a-z]+/)).filter( x => !x.match(/^(el|le|de|la|los)$/))
+  let names = searchTerm.filter( x => x.match(/[a-z]+/)).filter( x => !x.match(/^(el|d|le|de|la|los)$/))
 
   const default_query = { match_all: {} }
+
   let names_query
   let date_query
 
-  if (names.length === 2) {
+  if (names.length > 0) {
     names_query = {
       bool: {
-        minimum_should_match: 1,
+        must: [
+          {
+            match: {
+              PRENOMS_NOM: {
+                query: names.join(" "),
+                fuzziness: "auto"
+              }
+            }
+          }
+        ],
         should: [
           {
-            bool: {
-              must: [
-                {
-                  bool: {
-                    must: [
-                      {
-                        match: {
-                          NOM: {
-                            query: names[0],
-                            fuzziness: "auto"
-                          }
-                        }
-                      }
-                    ],
-                    should: [
-                      {
-                        match: {
-                          NOM: names[0]
-                        }
-                      }
-                    ]
-                  }
-                },
-                {
-                  bool: {
-                    must: [
-                      {
-                        match: {
-                          PRENOMS: {
-                            query: names[1],
-                            fuzziness: "auto"
-                          }
-                        }
-                      }
-                    ],
-                    should: [
-                      {
-                        match: {
-                          PRENOM: {
-                            query: names[1],
-                            fuzziness: "auto"
-                          }
-                        }
-                      },
-                      {
-                        match: {
-                          PRENOM: names[1]
-                        }
-                      }
-                    ]
-                  }
-                }
-              ]
+            match: {
+              PRENOM_NOM: names.join(" "),
             }
           },
           {
-            bool: {
-              must: [
-                {
-                  bool: {
-                    must: [
-                      {
-                        match: {
-                          NOM: {
-                            query: names[1],
-                            fuzziness: "auto"
-                          }
-                        }
-                      }
-                    ],
-                    should: [
-                      {
-                        match: {
-                          NOM: names[1]
-                        }
-                      }
-                    ]
-                  }
-                },
-                {
-                  bool: {
-                    must: [
-                      {
-                        match: {
-                          PRENOMS: {
-                            query: names[0],
-                            fuzziness: "auto"
-                          }
-                        }
-                      }
-                    ],
-                    should: [
-                      {
-                        match: {
-                          PRENOM: {
-                            query: names[0],
-                            fuzziness: "auto"
-                          }
-                        }
-                      },
-                      {
-                        match: {
-                          PRENOM: names[0]
-                        }
-                      }
-                    ]
-                  }
-                }
-              ]
+            match: {
+              PRENOM_NOM: {
+                query: names.join(" "),
+                fuzziness: "auto"
+              }
             }
           }
         ]
       }
     }
-  } else if (names.length > 0) {
-    names_query = {
-      multi_match : {
-        query:      names.join(" "),
-        type:       "cross_fields",
-        fields:     [ "NOM", "PRENOM" ],
-        operator:   "and"
-      }
+
+    if (names.length === 2) {
+      names_query.bool.must.push(
+        {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    {
+                      bool: {
+                        must: [
+                          {
+                            match: {
+                              NOM: {
+                                query: names[0],
+                                fuzziness: "auto"
+                              }
+                            }
+                          }
+                        ],
+                        should: [
+                          {
+                            match: {
+                              NOM: names[0]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      bool: {
+                        must: [
+                          {
+                            match: {
+                              PRENOMS: {
+                                query: names[1],
+                                fuzziness: "auto"
+                              }
+                            }
+                          }
+                        ],
+                        should: [
+                          {
+                            match: {
+                              PRENOM: {
+                                query: names[1],
+                                fuzziness: "auto"
+                              }
+                            }
+                          },
+                          {
+                            match: {
+                              PRENOM: names[1]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    {
+                      bool: {
+                        must: [
+                          {
+                            match: {
+                              NOM: {
+                                query: names[1],
+                                fuzziness: "auto"
+                              }
+                            }
+                          }
+                        ],
+                        should: [
+                          {
+                            match: {
+                              NOM: names[1]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      bool: {
+                        must: [
+                          {
+                            match: {
+                              PRENOMS: {
+                                query: names[0],
+                                fuzziness: "auto"
+                              }
+                            }
+                          }
+                        ],
+                        should: [
+                          {
+                            match: {
+                              PRENOM: {
+                                query: names[0],
+                                fuzziness: "auto"
+                              }
+                            }
+                          },
+                          {
+                            match: {
+                              PRENOM: names[0]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      )
     }
   }
 
@@ -180,11 +206,14 @@ function buildMatch(searchTerm) {
 
   const query = date_query
     ? names_query
-      ?
-        {
-          bool: {
-            must: [ names_query ],
-            should: [ date_query ]
+      ? {
+          function_score: {
+            query: {
+              bool: {
+                must: [ names_query ],
+                should: [ date_query ]
+              }
+            }
           }
         }
       : date_query
