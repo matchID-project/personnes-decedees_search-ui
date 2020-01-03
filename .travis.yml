@@ -30,7 +30,7 @@ before_script:
 script:
   - env
   - git fetch --unshallow && git tag -l
-  - make build docker-image
+  - make build
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
@@ -38,5 +38,4 @@ after_success:
     fi
 
 after_script:
-  - rm artifacts
   - make build-dir-clean
