@@ -4,17 +4,17 @@ import MatchIDHeader from "./MatchIDHeader"
 
 import {
   ErrorBoundary,
-  Facet,
+  // Facet,
   SearchProvider,
   WithSearch,
-  Results,
+  // Results,
   PagingInfo,
   ResultsPerPage,
   Paging,
-  Sorting
+  // Sorting
 } from "@elastic/react-search-ui";
 import { Layout, SingleSelectFacet } from "@elastic/react-search-ui-views";
-import "@elastic/react-search-ui-views/lib/styles/styles.css";
+// import "@elastic/react-search-ui-views/lib/styles/styles.css";
 import "./App.css";
 
 import buildRequest from "./buildRequest";

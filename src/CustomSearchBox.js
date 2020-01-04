@@ -1,13 +1,10 @@
 import React from "react";
 
-import 'react-bulma-components/dist/react-bulma-components.min.css';
-
 import {
   Button,
   Columns,
   Container
 } from 'react-bulma-components';
-
 
 import { SearchBox } from "@elastic/react-search-ui";
 import CustomAutocompleteView from "./CustomAutocompleteView";

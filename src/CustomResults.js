@@ -1,25 +1,11 @@
 import React from "react";
 
-import 'react-bulma-components/dist/react-bulma-components.min.css';
-
 import {
-  Card,
   Columns,
-  Content,
   Container,
-  Heading,
-  Image,
-  Media,
-  Table
 } from 'react-bulma-components';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import {
-    faExclamationTriangle
-} from '@fortawesome/free-solid-svg-icons';
-
-import { Results } from "@elastic/react-search-ui";
+import CustomResult from "./CustomResult";
 
 export default function CustomResults(results) {
     return(
