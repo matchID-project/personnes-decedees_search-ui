@@ -128,9 +128,6 @@ export default function CustomResult({result}) {
                                         </tbody>
                                     </Table>
                                 </Columns.Column>
-                                <Columns.Column size={12}>
-                                    {qwantResult}
-                                </Columns.Column>
                             </Columns>
                         </Content>
                     </Card.Content>
