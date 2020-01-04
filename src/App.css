@@ -584,6 +584,16 @@ html.has-navbar-fixed-top {
   background-color: rgba(0,0,0,.05);
 }
 
+.navbar-burger.is-active span:first-child {
+  transform:translateY(5px) rotate(45deg)
+ }
+ .navbar-burger.is-active span:nth-child(2) {
+  opacity:0
+ }
+ .navbar-burger.is-active span:nth-child(3) {
+  transform:translateY(-5px) rotate(-45deg)
+ }
+
 .navbar-menu {
   display: none;
 }
@@ -657,6 +667,10 @@ a.navbar-item {
     -webkit-overflow-scrolling: touch;
     max-height: calc(100vh - 3.25rem);
     overflow: auto;
+  }
+
+  .navbar-menu.is-active {
+    display: block;
   }
 }
 
