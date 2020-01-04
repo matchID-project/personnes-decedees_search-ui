@@ -1,7 +1,5 @@
 import React from "react";
 
-import qwant from "qwant-api";
-
 import {
   Card,
   Columns,
@@ -17,17 +15,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
-
-
-// async function search(query) {
-//     return new Promise(resolve => {
-//         qwant.search('web', query, (err, data) => {
-//             if (err) return console.log(err);
-//             resolve(data);
-//             }
-//         )
-//     })
-// }
 
 export default function CustomResult({result}) {
     if (result.error) {
@@ -61,17 +48,6 @@ export default function CustomResult({result}) {
         </Columns.Column>
         )
     } else {
-        let qwantResult
-        let qwantQuery = {
-            query: "site:fr.wikipedia.org" + ( result.PRENOM ? " " + result.PRENOM.raw : "" )
-                + " " + result.NOM.raw + " " + result.DATE_NAISSANCE.raw.replace(/(\d{4})(\d{2})(\d{2})/,"$3/$2/$1"),
-            count: 1,
-            language: 'french'
-        }
-        qwant.search('web', qwantQuery, (err,data) => {
-            console.log(err,data)
-        });
-
         return (
             <Columns.Column size={12}>
                 <Card>
