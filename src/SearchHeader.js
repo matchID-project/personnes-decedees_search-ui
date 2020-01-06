@@ -7,7 +7,7 @@ import {
 
 import CustomSearchBox from "./CustomSearchBox";
 
-export default function SearchHeader(setSearchTerm) {
+export default function SearchHeader({setSearchTerm}) {
     return (
       <Hero>
         <Heading style={{color: "#fff"}}>

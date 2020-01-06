@@ -114,7 +114,7 @@ class App extends React.Component {
             <div className="App">
               <ErrorBoundary>
                 <Layout
-                  header={SearchHeader(setSearchTerm)}
+                  header={SearchHeader({setSearchTerm})}
 
                   bodyContent={CustomResults(results)}
                   sideContent={null}
