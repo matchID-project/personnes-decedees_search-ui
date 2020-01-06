@@ -115,13 +115,14 @@ export default function CustomResult({result}) {
                                             <tr>
                                                 <td>Lieu</td>
                                                 <td>
-                                                    {result.COMMUNE_DECES
-                                                    ? result.PAYS_DECES
+                                                    {
+                                                    result.COMMUNE_DECES
+                                                    ? ( result.PAYS_DECES
                                                         ? result.COMMUNE_DECES.raw + ", " + result.PAYS_DECES.raw
-                                                        : result.COMMUNE_DECES
-                                                    : result.PAYS_DECES
+                                                        : result.COMMUNE_DECES.raw )
+                                                    : (result.PAYS_DECES
                                                         ? result.PAYS_DECES.raw
-                                                        : "ND"
+                                                        : "ND")
                                                     }
                                                 </td>
                                             </tr>
