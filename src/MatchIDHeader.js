@@ -35,7 +35,7 @@ export default function MatchIDHeader({toggleModal, modalState, toggleBurger, bu
             >
                 <Container>
                     <Navbar.Brand>
-                        <Navbar.Item class="logo" onClick={toggleModal}>
+                        <Navbar.Item className="logo" onClick={toggleModal}>
                             <img src={process.env.PUBLIC_URL + "/matchID-logo.svg"} alt="matchID Logo" />
                         </Navbar.Item>
                         <Navbar.Burger

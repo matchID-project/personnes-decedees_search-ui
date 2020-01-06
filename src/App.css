@@ -1300,3 +1300,20 @@ border-bottom: 1px solid
 .delete:hover {
  background-color:rgba(10,10,10,.3)
 }
+
+
+@media print,screen and (min-width:769px) {
+  .logo {
+  margin-top: -8px;
+  margin-bottom: -8px;
+  margin-left: -12px;
+  }
+}
+@media print,screen and (max-width:768px) {
+  .logo {
+  margin-top: -8px;
+  margin-bottom: -15px;
+  margin-left: -12px;
+  }
+}
+
