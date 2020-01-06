@@ -14,7 +14,7 @@ export default function CustomResults(results) {
             { !!results &&
                 results.map((result, i) => {
                     return (
-                        <CustomResult result={result} />
+                        <CustomResult key={i} result={result} />
                     )
                     }
                 )
