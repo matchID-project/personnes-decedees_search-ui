@@ -1,7 +1,4 @@
-import PropTypes from "prop-types";
 import React from "react";
-
-import { Result } from "@elastic/react-search-ui";
 
 import {
   Container,
@@ -14,7 +11,6 @@ function CustomAutocompleteView({
   autocompletedResults,
   getItemProps,
 }) {
-  let index = 0;
   return (
     <div className="sui-search-box__autocomplete-container">
       <Container style={{marginLeft: "15px", marginTop: "-20px"}} className="is-widescreen">

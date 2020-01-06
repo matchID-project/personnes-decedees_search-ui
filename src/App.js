@@ -13,20 +13,23 @@ import {
   Paging,
   // Sorting
 } from "@elastic/react-search-ui";
-import { Layout, SingleSelectFacet } from "@elastic/react-search-ui-views";
+import {
+  Layout,
+  // SingleSelectFacet
+} from "@elastic/react-search-ui-views";
 // import "@elastic/react-search-ui-views/lib/styles/styles.css";
 import "./App.css";
 
 import buildRequest from "./buildRequest";
 import runRequest from "./runRequest";
-import applyDisjunctiveFaceting from "./applyDisjunctiveFaceting";
+// import applyDisjunctiveFaceting from "./applyDisjunctiveFaceting";
 import buildState from "./buildState";
 import SearchHeader from "./SearchHeader";
 import CustomResults from "./CustomResults";
 
 const config = {
-  debug: true,
-  hasA11yNotifications: true,
+  // debug: true,
+  // hasA11yNotifications: true,
   onResultClick: () => {
     /* Not implemented */
   },

@@ -21,10 +21,6 @@ import {
     faTable
 } from '@fortawesome/free-solid-svg-icons';
 
-import {
-    faUsb
-} from '@fortawesome/free-brands-svg-icons';
-
 export default function MatchIDHeader({toggleModal, modalState, toggleBurger, burgerState}) {
     return (
         <>
