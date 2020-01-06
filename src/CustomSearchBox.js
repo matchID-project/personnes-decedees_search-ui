@@ -9,7 +9,7 @@ import {
 import { SearchBox } from "@elastic/react-search-ui";
 import CustomAutocompleteView from "./CustomAutocompleteView";
 
-export default function CustomSearchBox(setSearchTerm) {
+export default function CustomSearchBox({setSearchTerm}) {
     return (
     <SearchBox
         autocompleteMinimumCharacters={3}
@@ -40,7 +40,7 @@ export default function CustomSearchBox(setSearchTerm) {
           </Container>
       )}
       onSelectAutocomplete={(selection) => {
-        setSearchTerm.setSearchTerm(selection.PRENOM.raw + " " + selection.NOM.raw + " " +
+        setSearchTerm(selection.PRENOM.raw + " " + selection.NOM.raw + " " +
           selection.DATE_NAISSANCE.raw.replace(/(\d{4})(\d{2})(\d{2})/,"$3/$2/$1")
         )
       }}
