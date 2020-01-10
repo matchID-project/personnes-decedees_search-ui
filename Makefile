@@ -123,6 +123,11 @@ clean-frontend:
 	@sudo rm -rf ${FRONTEND}/dist
 	@sudo mkdir -p ${FRONTEND}/dist
 
+clean-elasticsearch: elasticsearch-stop
+	@sudo rm -rf ${ES_DATA}
+
+clean: clean-frontend clean-elasticsearch
+
 network-stop:
 	docker network rm ${DC_NETWORK}
 
