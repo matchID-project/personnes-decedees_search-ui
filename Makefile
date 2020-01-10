@@ -35,11 +35,30 @@ export DC := /usr/local/bin/docker-compose
 export GIT_ORIGIN=origin
 export GIT_BRANCH=dev
 
+# backup dir
+export BACKUP_DIR = ${APP_PATH}/backup
+
 # elasticsearch defaut configuration
 export ES_HOST = elasticsearch
 export ES_PORT = 9200
 export ES_PROXY_PATH = /${APP}/api/v0/search
 export ES_INDEX = deces
+export ES_DATA = ${APP_PATH}/esdata
+export ES_NODES = 1
+export ES_MEM = 1024m
+export ES_VERSION = 7.5.0
+export ES_BACKUP_FILE := $(shell echo esdata_`date +"%Y%m%d"`.tar)
+
+vm_max_count            := $(shell cat /etc/sysctl.conf | egrep vm.max_map_count\s*=\s*262144 && echo true)
+
+
+# s3 conf
+# s3 conf has to be stored in two ways :
+# classic way (.aws/config and .aws/credentials) for s3 backups
+# to use within matchid backend, you have to add credential as env variables and declare configuration in a s3 connector
+# 	export aws_access_key_id=XXXXXXXXXXXXXXXXX
+# 	export aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXX
+export S3_BUCKET=fichier-des-personnes-decedees
 
 dummy		    := $(shell touch artifacts)
 include ./artifacts
@@ -189,6 +208,45 @@ stop: frontend-stop
 
 start: frontend
 	@sleep 2 && docker-compose logs
+
+
+backup-dir:
+	@if [ ! -d "$(BACKUP_DIR)" ] ; then mkdir -p $(BACKUP_DIR) ; fi
+
+elasticsearch-s3-pull: backup-dir
+	@echo pulling s3://${S3_BUCKET}/${ES_BACKUP_FILE}
+	@aws s3 cp s3://${S3_BUCKET}/${ES_BACKUP_FILE} ${BACKUP_DIR}/${ES_BACKUP_FILE}
+
+elasticsearch-stop:
+	@echo docker-compose down matchID elasticsearch
+	@if [ -f "${DC_FILE}-elasticsearch-huge.yml" ]; then ${DC} -f ${DC_FILE}-elasticsearch-huge.yml down;fi
+
+elasticsearch-restore: elasticsearch-stop backup-dir
+	@if [ -d "$(ES_DATA)" ] ; then (echo purgin ${ES_DATA} && sudo rm -rf ${ES_DATA} && echo purge done) ; fi
+	@if [ ! -f "${BACKUP_DIR}/${ES_BACKUP_FILE}" ] ; then (echo no such archive "${BACKUP_DIR}/${ES_BACKUP_FILE}" && exit 1);fi
+	@echo restoring from ${BACKUP_DIR}/${ES_BACKUP_FILE} to ${ES_DATA} && \
+	 sudo tar xf ${BACKUP_DIR}/${ES_BACKUP_FILE} -C $$(dirname ${ES_DATA}) && \
+	 echo backup restored
+
+vm_max:
+ifeq ("$(vm_max_count)", "")
+	@echo updating vm.max_map_count $(vm_max_count) to 262144
+	sudo sysctl -w vm.max_map_count=262144
+endif
+
+elasticsearch: network vm_max
+	@echo docker-compose up elasticsearch with ${ES_NODES} nodes
+	@cat ${DC_FILE}-elasticsearch.yml | sed "s/%M/${ES_MEM}/g" > ${DC_FILE}-elasticsearch-huge.yml
+	@(if [ ! -d ${ES_DATA}/node1 ]; then sudo mkdir -p ${ES_DATA}/node1 ; sudo chmod g+rw ${ES_DATA}/node1/.; sudo chgrp 1000 ${ES_DATA}/node1/.; fi)
+	@(i=$(ES_NODES); while [ $${i} -gt 1 ]; \
+		do \
+			if [ ! -d ${ES_DATA}/node$$i ]; then (echo ${ES_DATA}/node$$i && sudo mkdir -p ${ES_DATA}/node$$i && sudo chmod g+rw ${ES_DATA}/node$$i/. && sudo chgrp 1000 ${ES_DATA}/node$$i/.); fi; \
+		cat ${DC_FILE}-elasticsearch-node.yml | sed "s/%N/$$i/g;s/%MM/${ES_MEM}/g;s/%M/${ES_MEM}/g" >> ${DC_FILE}-elasticsearch-huge.yml; \
+		i=`expr $$i - 1`; \
+	done;\
+	true)
+	${DC} -f ${DC_FILE}-elasticsearch-huge.yml up -d
+
 
 up: start
 
