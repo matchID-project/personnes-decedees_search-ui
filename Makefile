@@ -222,7 +222,6 @@ stop: frontend-stop
 start: frontend
 	@sleep 2 && docker-compose logs
 
-
 backup-dir:
 	@if [ ! -d "$(BACKUP_DIR)" ] ; then mkdir -p $(BACKUP_DIR) ; fi
 
@@ -267,3 +266,21 @@ down: stop
 
 restart: down up
 
+deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
+
+deploy-remote:
+	@if [ -z "${REMOTE_HOST}" -o -z "${aws_access_key_id}" -o -z "${aws_access_key_id}" ];\
+		then echo you have to specify REMOTE_HOST aws_access_key_id and aws_access_key_id;fi
+	@ssh ${REMOTE_HOST} 'if [ -d "$$(basename ${APP_PATH})" ]; then \
+		echo cleaning previsous install;\
+		rm -rf $$(basename ${APP_PATH});fi'
+	@echo remote cloning Github repo
+	@ssh ${REMOTE_HOST} git clone https://github.com/matchid-project/personnes-decedees_search-ui
+	@echo copy s3 configuration
+	@ssh ${REMOTE_HOST} mkdir -p .aws
+	@scp aws_config ${REMOTE_HOST}:.aws/
+	@echo deploying
+	@ssh ${REMOTE_HOST} \
+		'export aws_access_key_id=${aws_access_key_id};\
+		export aws_secret_access_key=${aws_secret_access_key};\
+		make -C $$(basename ${APP_PATH}) deploy-local'
