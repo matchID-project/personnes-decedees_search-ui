@@ -111,7 +111,15 @@ ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
 	@sudo chmod +x /usr/local/bin/docker-compose
 endif
 
-clean:
+install-aws-cli:
+ifeq ("$(wildcard ~/.local/bin/aws)","")
+        sudo apt-get update; true
+        sudo apt install -y python-pip; true
+        pip install aws awscli_plugin_endpoint ; true
+endif
+
+
+clean-frontend:
 	@sudo rm -rf ${FRONTEND}/dist
 	@sudo mkdir -p ${FRONTEND}/dist
 
