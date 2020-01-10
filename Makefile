@@ -113,9 +113,9 @@ endif
 
 install-aws-cli:
 ifeq ("$(wildcard ~/.local/bin/aws)","")
-        sudo apt-get update; true
-        sudo apt install -y python-pip; true
-        pip install aws awscli_plugin_endpoint ; true
+	sudo apt-get update; true
+	sudo apt install -y python-pip; true
+	pip install aws awscli_plugin_endpoint ; true
 endif
 
 
