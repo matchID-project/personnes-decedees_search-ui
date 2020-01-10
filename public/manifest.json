@@ -1,6 +1,6 @@
 {
-  "short_name": "Search UI",
-  "name": "Search UI pour les personnes décédées",
+  "short_name": "matchID",
+  "name": "matchID moteur de recherche pour les personnes décédées",
   "icons": [
     {
       "src": "favicon.svg",

@@ -273,14 +273,19 @@ deploy-remote:
 		then echo you have to specify REMOTE_HOST aws_access_key_id and aws_access_key_id;fi
 	@ssh ${REMOTE_HOST} 'if [ -d "$$(basename ${APP_PATH})" ]; then \
 		echo cleaning previsous install;\
-		rm -rf $$(basename ${APP_PATH});fi'
+		sudo rm -rf $$(basename ${APP_PATH});fi'
 	@echo remote cloning Github repo
 	@ssh ${REMOTE_HOST} git clone https://github.com/matchid-project/personnes-decedees_search-ui
+	@echo terraforming
+	@ssh ${REMOTE_HOST} make -C $$(basename ${APP_PATH}) install-prerequisites install-aws-cli
 	@echo copy s3 configuration
 	@ssh ${REMOTE_HOST} mkdir -p .aws
 	@scp aws_config ${REMOTE_HOST}:.aws/
+	@echo -e "[default]\naws_access_key_id=${aws_access_key_id}\naws_secret_access_key=${aws_secret_access_key}\n" | ssh ${REMOTE_HOST} 'cat > .aws/credentials'
 	@echo deploying
-	@ssh ${REMOTE_HOST} \
-		'export aws_access_key_id=${aws_access_key_id};\
-		export aws_secret_access_key=${aws_secret_access_key};\
-		make -C $$(basename ${APP_PATH}) deploy-local'
+	@ssh ${REMOTE_HOST} make -C $$(basename ${APP_PATH}) deploy-local
+	@echo cleaning secrets
+	@ssh ${REMOTE_HOST} rm .aws/credentials
+	@echo testing remote services
+	@ssh ${REMOTE_HOST} '(curl -s --fail -XGET "http://localhost:${PORT}/" > /dev/null)' && echo frontend ok
+	@ssh ${REMOTE_HOST} '(curl -s --fail -XPOST "http://localhost:${PORT}${ES_PROXY_PATH}/?q=*" -H "Content-Type: application/json" > /dev/null)' && echo elasticsearch ok
