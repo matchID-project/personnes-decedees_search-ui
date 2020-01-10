@@ -59,6 +59,7 @@ vm_max_count            := $(shell cat /etc/sysctl.conf | egrep vm.max_map_count
 # 	export aws_access_key_id=XXXXXXXXXXXXXXXXX
 # 	export aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXX
 export S3_BUCKET=fichier-des-personnes-decedees
+export AWS=~/.local/bin/aws
 
 dummy		    := $(shell touch artifacts)
 include ./artifacts
@@ -112,12 +113,11 @@ ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
 endif
 
 install-aws-cli:
-ifeq ("$(wildcard ~/.local/bin/aws)","")
+ifeq ("$(wildcard ${AWS})","")
 	sudo apt-get update; true
 	sudo apt install -y python-pip; true
 	pip install aws awscli_plugin_endpoint ; true
 endif
-
 
 clean-frontend:
 	@sudo rm -rf ${FRONTEND}/dist
@@ -228,7 +228,7 @@ backup-dir:
 
 elasticsearch-s3-pull: backup-dir
 	@echo pulling s3://${S3_BUCKET}/${ES_BACKUP_FILE}
-	@aws s3 cp s3://${S3_BUCKET}/${ES_BACKUP_FILE} ${BACKUP_DIR}/${ES_BACKUP_FILE}
+	@${AWS} s3 cp s3://${S3_BUCKET}/${ES_BACKUP_FILE} ${BACKUP_DIR}/${ES_BACKUP_FILE}
 
 elasticsearch-stop:
 	@echo docker-compose down matchID elasticsearch
