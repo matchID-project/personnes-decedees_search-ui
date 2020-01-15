@@ -7,6 +7,8 @@ personnes-decedees-search-ui-*
 docker-compose-elasticsearch-huge.yml
 backup
 esdata
+.data.sha1
+.dataprep.sha1
 
 # dependencies
 /node_modules
