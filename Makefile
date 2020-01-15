@@ -129,7 +129,7 @@ clean-frontend:
 	@sudo mkdir -p ${FRONTEND}/dist
 
 clean-elasticsearch: elasticsearch-stop
-	@sudo rm -rf ${ES_DATA}
+	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE}
 
 clean: clean-frontend clean-elasticsearch
 
