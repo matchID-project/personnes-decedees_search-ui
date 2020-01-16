@@ -64,7 +64,7 @@ vm_max_count            := $(shell cat /etc/sysctl.conf | egrep vm.max_map_count
 # 	export aws_access_key_id=XXXXXXXXXXXXXXXXX
 # 	export aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXX
 export S3_BUCKET=fichier-des-personnes-decedees
-export AWS=~/.local/bin/aws
+export AWS=${APP_VERSION}/aws
 
 dummy		    := $(shell touch artifacts)
 include ./artifacts
@@ -118,11 +118,7 @@ ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
 endif
 
 install-aws-cli:
-ifeq ("$(wildcard ${AWS})","")
-	sudo apt-get update; true
-	sudo apt install -y python-pip; true
-	pip install aws awscli_plugin_endpoint ; true
-endif
+	@docker-pull matchid/tools
 
 clean-frontend:
 	@sudo rm -rf ${FRONTEND}/dist
