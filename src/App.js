@@ -109,7 +109,6 @@ class App extends React.Component {
           toggleModal={this.toggleModal}
           modalState={this.state.modalState}
           toggleBurger={this.toggleBurger}
-          burgerState={this.state.burgerState}
         />
         <SearchProvider config={config}>
         <WithSearch mapContextToProps={({ setSearchTerm, wasSearched, results }) => ({ setSearchTerm, wasSearched, results })}>
