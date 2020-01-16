@@ -10,6 +10,13 @@ import { SearchBox } from "@elastic/react-search-ui";
 import CustomAutocompleteView from "./CustomAutocompleteView";
 
 export default function CustomSearchBox({setSearchTerm}) {
+    clickRecherche = () => {
+      ReactGA.event({
+        category: 'recherche',
+        action: 'button',
+        label: 'test'
+      });
+    }
     return (
     <SearchBox
         autocompleteMinimumCharacters={3}
@@ -32,6 +39,7 @@ export default function CustomSearchBox({setSearchTerm}) {
                 <Button
                   className="is-size-5 is-fullwidth"
                   color="info"
+                  onClick={this.clickRecherche}
                 >
                   Recherche
                 </Button>
