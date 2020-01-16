@@ -64,7 +64,7 @@ vm_max_count            := $(shell cat /etc/sysctl.conf | egrep vm.max_map_count
 # 	export aws_access_key_id=XXXXXXXXXXXXXXXXX
 # 	export aws_secret_access_key=XXXXXXXXXXXXXXXXXXXXXXXXXXX
 export S3_BUCKET=fichier-des-personnes-decedees
-export AWS=${APP_VERSION}/aws
+export AWS=${APP_PATH}/aws
 
 dummy		    := $(shell touch artifacts)
 include ./artifacts
