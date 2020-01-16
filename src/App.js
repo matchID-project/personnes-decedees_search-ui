@@ -1,6 +1,5 @@
 import React from "react";
-
-import MatchIDHeader from "./MatchIDHeader"
+import ReactGA from 'react-ga';
 
 import {
   ErrorBoundary,
@@ -72,6 +71,10 @@ class App extends React.Component {
 
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleBurger = this.toggleBurger.bind(this);
+
+    this.ReactGA.initialize('UA-156429702-1');
+    this.ReactGA.pageview('/homepage');
+
   }
 
   toggleModal() {
