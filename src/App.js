@@ -1,6 +1,5 @@
 import React from "react";
-
-import MatchIDHeader from "./MatchIDHeader"
+import ReactGA from 'react-ga';
 
 import {
   ErrorBoundary,
@@ -26,6 +25,7 @@ import runRequest from "./runRequest";
 import buildState from "./buildState";
 import SearchHeader from "./SearchHeader";
 import CustomResults from "./CustomResults";
+import MatchIDHeader from "./MatchIDHeader";
 
 const config = {
   // debug: true,
@@ -72,6 +72,10 @@ class App extends React.Component {
 
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleBurger = this.toggleBurger.bind(this);
+
+    this.ReactGA.initialize('UA-156429702-1');
+    this.ReactGA.pageview('/homepage');
+
   }
 
   toggleModal() {
@@ -106,7 +110,6 @@ class App extends React.Component {
           toggleModal={this.toggleModal}
           modalState={this.state.modalState}
           toggleBurger={this.toggleBurger}
-          burgerState={this.state.burgerState}
         />
         <SearchProvider config={config}>
         <WithSearch mapContextToProps={({ setSearchTerm, wasSearched, results }) => ({ setSearchTerm, wasSearched, results })}>

@@ -21,7 +21,7 @@ import {
     faTable
 } from '@fortawesome/free-solid-svg-icons';
 
-export default function MatchIDHeader({toggleModal, modalState, toggleBurger, burgerState}) {
+export default function MatchIDHeader({toggleModal, modalState, toggleBurger}) {
     return (
         <>
             <Navbar
