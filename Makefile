@@ -81,6 +81,7 @@ export FILE_FRONTEND_APP_VERSION = $(APP)-$(APP_VERSION)-frontend.tar.gz
 export FILE_FRONTEND_DIST_APP_VERSION = $(APP)-$(APP_VERSION)-frontend-dist.tar.gz
 export FILE_FRONTEND_DIST_LATEST_VERSION = $(APP)-latest-frontend-dist.tar.gz
 
+export DOCKER_USERNAME=matchid
 export DC_BUILD_FRONTEND = ${DC_FILE}-build.yml
 export DC_RUN_NGINX_FRONTEND = ${DC_FILE}.yml
 export BUILD_DIR=${APP_PATH}/${APP}-build
