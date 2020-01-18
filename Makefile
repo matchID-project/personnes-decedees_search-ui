@@ -114,7 +114,7 @@ clean: clean-frontend clean-elasticsearch
 network-stop:
 	docker network rm ${DC_NETWORK}
 
-network: install-prerequisites
+network: config
 	@docker network create ${DC_NETWORK_OPT} ${DC_NETWORK} 2> /dev/null; true
 
 frontend-update:
