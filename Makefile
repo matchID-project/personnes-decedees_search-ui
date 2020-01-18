@@ -264,7 +264,8 @@ ${DATAPREP_VERSION_FILE}: ${GIT_DATAPREP}
 
 ${DATA_VERSION_FILE}:
 	@${AWS} s3 ls ${S3_BUCKET} | egrep '${FILES_TO_PROCESS}' |\
-		awk '{print $$NF}' | sort | sha1sum | awk '{print $1}' |\
+		awk '{print $$NF}' | sort > ${DATA_VERSION_FILE}.list
+	@cat ${DATA_VERSION_FILE}.list | sed 's/\s*$$//g' | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
 deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
