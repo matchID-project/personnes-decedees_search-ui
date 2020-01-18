@@ -26,7 +26,6 @@ export API_USER_SCOPE=http_x_forwarded_for
 export API_GLOBAL_LIMIT_RATE=20r/s
 export API_GLOBAL_BURST=200 nodelay
 
-export DOCKER_USERNAME=matchid
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
 export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
@@ -90,16 +89,18 @@ include /etc/os-release
 
 config:
 	# this proc relies on matchid/tools and works both local and remote
-	@apt-get install make
-	if [ -z "${TOOLS_PATH}" ];then\
+	@sudo apt-get install make
+	@if [ -z "${TOOLS_PATH}" ];then\
 		git clone ${GIT_ROOT}/${GIT_TOOLS};\
 		make -C ${GIT_TOOLS} config;\
 	else\
-		ln -s ${TOOLS_PATH} ${GIT_TOOLS}
+		ln -s ${TOOLS_PATH} ${GIT_TOOLS};\
 	fi
-	ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws;\
-	make -C ${GIT_TOOLS} docker-pull APP=${APP} APP_VERSION=${APP_VERSION}
-	touch config
+	@ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws
+	@touch config
+
+docker-pull:
+	@make -C ${GIT_TOOLS} docker-pull DC_IMAGE_NAME=${APP} APP_VERSION=${APP_VERSION}
 
 clean-frontend:
 	@sudo rm -rf ${FRONTEND}/dist
@@ -265,7 +266,7 @@ ${DATA_VERSION_FILE}:
 		awk '{print $$NF}' | sort | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
-deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch up
+deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
 
 deploy-remote: config
 	make -C ${TOOLS_PATH} remote-actions APP=${APP} APP_VERSION=${APP_VERSION} ACTIONS=deploy-local
