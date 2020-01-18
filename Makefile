@@ -14,6 +14,7 @@ export PORT=8082
 
 #base paths
 export APP = personnes-decedees-search-ui
+export APP_GROUP = matchID
 export APP_PATH := $(shell pwd)
 export FRONTEND := ${APP_PATH}
 export FRONTEND_DEV_HOST = frontend-development
@@ -36,6 +37,7 @@ export GIT_ORIGIN=origin
 export GIT_BRANCH=master
 export GIT_DATAPREP = personnes-decedees_search
 export GIT_ROOT = https://github.com/matchid-project
+export GIT_TOOLS = tools
 
 # backup dir
 export BACKUP_DIR = ${APP_PATH}/backup
@@ -86,39 +88,18 @@ export BUILD_DIR=${APP_PATH}/${APP}-build
 
 include /etc/os-release
 
-
-install-prerequisites:
-ifeq ("$(wildcard /usr/bin/envsubst)","")
-	sudo apt-get update || true
-	sudo apt install -y gettext || true
-endif
-
-ifeq ("$(wildcard /usr/bin/docker)","")
-	echo install docker-ce, still to be tested
-	sudo apt-get update
-	sudo apt-get install \
-    	apt-transport-https \
-	ca-certificates \
-	curl \
-	software-properties-common
-
-	curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo apt-key add -
-	sudo add-apt-repository \
-		"deb https://download.docker.com/linux/ubuntu \
-		`lsb_release -cs` \
-   		stable"
-	sudo apt-get update
-	sudo apt-get install -y docker-ce
-endif
-	@(if (id -Gn ${USER} | grep -vc docker); then sudo usermod -aG docker ${USER}; fi) > /dev/null
-ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
-	@echo installing docker-compose
-	@sudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-	@sudo chmod +x /usr/local/bin/docker-compose
-endif
-
-install-aws-cli:
-	@docker-pull matchid/tools
+config:
+	# this proc relies on matchid/tools and works both local and remote
+	@apt-get install make
+	if [ -z "${TOOLS_PATH}" ];then\
+		git clone ${GIT_ROOT}/${GIT_TOOLS};\
+		make -C ${GIT_TOOLS} config;\
+	else\
+		ln -s ${TOOLS_PATH} ${GIT_TOOLS}
+	fi
+	ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws;\
+	make -C ${GIT_TOOLS} docker-pull APP=${APP} APP_VERSION=${APP_VERSION}
+	touch config
 
 clean-frontend:
 	@sudo rm -rf ${FRONTEND}/dist
@@ -158,16 +139,6 @@ dev: network frontend-stop frontend-dev
 dev-stop: frontend-dev-stop
 
 build: frontend-build nginx-build
-
-docker-push: docker-login
-	docker push ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
-
-docker-login:
-	@echo docker login for ${DOCKER_USERNAME}
-	@echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-
-docker-pull:
-	docker pull ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
 
 build-dir:
 	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
@@ -294,26 +265,7 @@ ${DATA_VERSION_FILE}:
 		awk '{print $$NF}' | sort | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
-deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
+deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch up
 
-deploy-remote:
-	@if [ -z "${REMOTE_HOST}" -o -z "${aws_access_key_id}" -o -z "${aws_access_key_id}" ];\
-		then echo you have to specify REMOTE_HOST aws_access_key_id and aws_access_key_id;fi
-	@ssh ${REMOTE_HOST} 'if [ -d "$$(basename ${APP_PATH})" ]; then \
-		echo cleaning previsous install;\
-		sudo rm -rf $$(basename ${APP_PATH});fi'
-	@echo remote cloning Github repo
-	@ssh ${REMOTE_HOST} git clone https://github.com/matchid-project/personnes-decedees_search-ui
-	@echo terraforming
-	@ssh ${REMOTE_HOST} make -C $$(basename ${APP_PATH}) install-prerequisites install-aws-cli
-	@echo copy s3 configuration
-	@ssh ${REMOTE_HOST} mkdir -p .aws
-	@scp aws_config ${REMOTE_HOST}:.aws/
-	@echo -e "[default]\naws_access_key_id=${aws_access_key_id}\naws_secret_access_key=${aws_secret_access_key}\n" | ssh ${REMOTE_HOST} 'cat > .aws/credentials'
-	@echo deploying
-	@ssh ${REMOTE_HOST} make -C $$(basename ${APP_PATH}) deploy-local
-	@echo cleaning secrets
-	@ssh ${REMOTE_HOST} rm .aws/credentials
-	@echo testing remote services
-	@ssh ${REMOTE_HOST} '(curl -s --fail -XGET "http://localhost:${PORT}/" > /dev/null)' && echo frontend ok
-	@ssh ${REMOTE_HOST} '(curl -s --fail -XPOST "http://localhost:${PORT}${ES_PROXY_PATH}/?q=*" -H "Content-Type: application/json" > /dev/null)' && echo elasticsearch ok
+deploy-remote: config
+	make -C ${TOOLS_PATH} remote-actions APP=${APP} APP_VERSION=${APP_VERSION} ACTIONS=deploy-local

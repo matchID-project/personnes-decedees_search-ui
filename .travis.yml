@@ -29,11 +29,11 @@ before_script:
 
 script:
   - git fetch --unshallow && git tag -l
-  - make build
+  - make config build
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-      make docker-push ;
+      make -C ${TOOLS_PATH} docker-push APP=${APP} APP_VERSION=${APP_VERSION};
     fi
 
 after_script:
