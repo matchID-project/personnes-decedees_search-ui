@@ -100,8 +100,11 @@ config:
 	@ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
-docker-pull:
+docker-pull: config
 	@make -C ${GIT_TOOLS} docker-pull DC_IMAGE_NAME=${APP} APP_VERSION=${APP_VERSION}
+
+docker-push: config
+	make -C ${GIT_TOOLS} docker-push DC_IMAGE_NAME=${APP} APP_VERSION=${APP_VERSION};
 
 clean-frontend:
 	@sudo rm -rf ${FRONTEND}/dist
