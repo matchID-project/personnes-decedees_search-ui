@@ -273,4 +273,6 @@ ${DATA_VERSION_FILE}:
 deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
 
 deploy-remote: config
-	make -C ${TOOLS_PATH} remote-actions APP=${APP} APP_VERSION=${APP_VERSION} ACTIONS=deploy-local
+	make -C ${TOOLS_PATH} remote-actions\
+		APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
+		ACTIONS=deploy-local
