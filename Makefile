@@ -29,9 +29,10 @@ export API_GLOBAL_BURST=200 nodelay
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
 export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
+export DC_IMAGE_NAME = ${DC_PREFIX}
 export DC_NETWORK := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_BUILD_ARGS = --pull --no-cache
-export DC_IMAGE_NAME=${DC_PREFIX}
+
 export DC := /usr/local/bin/docker-compose
 export GIT_ORIGIN=origin
 export GIT_BRANCH := $(shell git branch | grep '*' | awk '{print $$2}')
@@ -102,24 +103,8 @@ config:
 	@ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
-docker-tag:
-	@if [ "${GIT_BRANCH}" == "${GIT_BRANCH_MASTER}" ];then\
-		docker tag ${DOCKER_USERNAME}/${APP}:${APP_VERSION} ${DOCKER_USERNAME}/${APP}:latest;\
-	else\
-		docker tag ${DOCKER_USERNAME}/${APP}:${APP_VERSION} ${DOCKER_USERNAME}/${APP}:${GIT_BRANCH};\
-	fi
-
 docker-push: docker-login docker-tag
-	@docker push ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${APP_VERSION}
-	@if [ "${GIT_BRANCH}" == "${GIT_BRANCH_MASTER}" ];then\
-		docker push ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:latest;\
-	else\
-		docker push ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${GIT_BRANCH};\
-	fi
-
-docker-login:
-	@echo docker login for ${DOCKER_USERNAME}
-	@echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+	@make -C ${GIT_BRANCH} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
 
 docker-pull:
 	docker pull ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${APP_VERSION}
