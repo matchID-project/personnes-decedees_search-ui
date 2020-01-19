@@ -103,7 +103,7 @@ config:
 	@ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
-docker-push: docker-login docker-tag
+docker-push:
 	@make -C ${GIT_BRANCH} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
 
 docker-pull:
