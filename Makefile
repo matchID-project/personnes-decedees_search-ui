@@ -13,7 +13,7 @@ export USE_TTY := $(shell test -t 1 && USE_TTY="-t")
 export PORT=8082
 
 #base paths
-export APP = personnes-decedees-search-ui
+export APP = personnes-decedees_search-ui
 export APP_GROUP = matchID
 export APP_PATH := $(shell pwd)
 export FRONTEND := ${APP_PATH}
@@ -28,7 +28,7 @@ export API_GLOBAL_BURST=200 nodelay
 
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
-export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
+export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]' | tr '_' '-')
 export DC_IMAGE_NAME = ${DC_PREFIX}
 export DC_NETWORK := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_BUILD_ARGS = --pull --no-cache

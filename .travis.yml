@@ -41,6 +41,7 @@ after_success:
     elif [[ "$TRAVIS_BRANCH" == "dev" ]]; then
       make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
       make deploy-local FILES_TO_PROCESS=deces-1970.txt.gz;
+      make -C ${APP_PATH}/${GIT_TOOLS} remote-deploy APP=personnes-decedees_search-ui DC_IMAGE_NAME=${DC_PREFIX} APP_VERSION=${APP_VERSION} FILES_TO_PROCESS=deces-1970.txt.gz ACTIONS=deploy-local;
     fi
 
 after_script:
