@@ -31,9 +31,11 @@ export DC_FILE=${DC_DIR}/docker-compose
 export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_NETWORK := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_BUILD_ARGS = --pull --no-cache
+export DC_IMAGE_NAME=${DC_PREFIX}
 export DC := /usr/local/bin/docker-compose
 export GIT_ORIGIN=origin
-export GIT_BRANCH=master
+export GIT_BRANCH := $(shell git branch | grep '*' | awk '{print $$2}')
+export GIT_BRANCH_MASTER=master
 export GIT_DATAPREP = personnes-decedees_search
 export GIT_ROOT = https://github.com/matchid-project
 export GIT_TOOLS = tools
@@ -100,15 +102,27 @@ config:
 	@ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
-docker-pull: config
-	@make -C ${GIT_TOOLS} docker-pull DC_IMAGE_NAME=${APP} APP_VERSION=${APP_VERSION}
+docker-tag:
+	@if [ "${GIT_BRANCH}" == "${GIT_BRANCH_MASTER}" ];then\
+		docker tag ${DOCKER_USERNAME}/${APP}:${APP_VERSION} ${DOCKER_USERNAME}/${APP}:latest;\
+	else\
+		docker tag ${DOCKER_USERNAME}/${APP}:${APP_VERSION} ${DOCKER_USERNAME}/${APP}:${GIT_BRANCH};\
+	fi
 
-docker-push: config
-	make -C ${GIT_TOOLS} docker-push DC_IMAGE_NAME=${APP} APP_VERSION=${APP_VERSION};
+docker-push: docker-login docker-tag
+	@docker push ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${APP_VERSION}
+	@if [ "${GIT_BRANCH}" == "${GIT_BRANCH_MASTER}" ];then\
+		docker push ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:latest;\
+	else\
+		docker push ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${GIT_BRANCH};\
+	fi
 
-clean-frontend:
-	@sudo rm -rf ${FRONTEND}/dist
-	@sudo mkdir -p ${FRONTEND}/dist
+docker-login:
+	@echo docker login for ${DOCKER_USERNAME}
+	@echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+docker-pull:
+	docker pull ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${APP_VERSION}
 
 clean-elasticsearch: elasticsearch-stop
 	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE}
