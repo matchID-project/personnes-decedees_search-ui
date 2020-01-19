@@ -73,8 +73,8 @@ class App extends React.Component {
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleBurger = this.toggleBurger.bind(this);
 
-    this.ReactGA.initialize('UA-156429702-1');
-    this.ReactGA.pageview('/homepage');
+    ReactGA.initialize('UA-156429702-1');
+    ReactGA.pageview('/homepage');
 
   }
 
