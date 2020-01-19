@@ -33,10 +33,9 @@ script:
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-      make -C ${TOOLS_PATH} docker-push APP=${APP} APP_VERSION=${APP_VERSION};
-    fi
-  - if [[ "$TRAVIS_BRANCH" == "dev"]]; then
-      make -C ${TOOLS_PATH} docker-push APP=${APP} APP_VERSION=${APP_VERSION};
+      make docker-push;
+    elif [[ "$TRAVIS_BRANCH" == "dev"]]; then
+      make docker-push;
       make deploy-local FILES_TO_PROCESS=deces-1970.txt.gz;
     fi
 
