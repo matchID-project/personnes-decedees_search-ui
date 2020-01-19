@@ -96,15 +96,15 @@ config:
 	@sudo apt-get install make
 	@if [ -z "${TOOLS_PATH}" ];then\
 		git clone ${GIT_ROOT}/${GIT_TOOLS};\
-		make -C ${GIT_TOOLS} config;\
+		make -C ${APP_PATH}/${GIT_TOOLS} config;\
 	else\
-		ln -s ${TOOLS_PATH} ${GIT_TOOLS};\
+		ln -s ${TOOLS_PATH} ${APP_PATH}/${GIT_TOOLS};\
 	fi
-	@ln -s ${GIT_TOOLS}/aws ${APP_PATH}/aws
+	@ln -s ${APP_PATH}/${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
 docker-push:
-	@make -C ${GIT_BRANCH} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
+	@make -C ${APP_PATH}/${GIT_TOOLS} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
 
 docker-pull:
 	docker pull ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${APP_VERSION}

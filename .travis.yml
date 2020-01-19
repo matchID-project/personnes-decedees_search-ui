@@ -37,9 +37,9 @@ script:
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-      make docker-push;
+      make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
     elif [[ "$TRAVIS_BRANCH" == "dev" ]]; then
-      make docker-push;
+      make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
       make deploy-local FILES_TO_PROCESS=deces-1970.txt.gz;
     fi
 
