@@ -30,6 +30,7 @@ export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
 export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]' | tr '_' '-')
 export DC_IMAGE_NAME = ${DC_PREFIX}
+export API_PATH = ${DC_PREFIX}
 export DC_NETWORK := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_BUILD_ARGS = --pull --no-cache
 
@@ -47,7 +48,7 @@ export BACKUP_DIR = ${APP_PATH}/backup
 # elasticsearch defaut configuration
 export ES_HOST = elasticsearch
 export ES_PORT = 9200
-export ES_PROXY_PATH = /${APP}/api/v0/search
+export ES_PROXY_PATH = /${API_PATH}/api/v0/search
 export ES_INDEX = deces
 export ES_DATA = ${APP_PATH}/esdata
 export ES_NODES = 1
