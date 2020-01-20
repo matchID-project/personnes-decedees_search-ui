@@ -105,20 +105,18 @@ config:
 	@touch config
 
 clean-elasticsearch: elasticsearch-stop
-	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE}
+	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE} > /dev/null 2>&1 || true
 
 
-clean-frontend: build-dir-clean
-	@rm ${NGINX}/$(FILE_FRONTEND_DIST_APP_VERSION)\
-		${FRONTEND}/$(FILE_FRONTEND_APP_VERSION)
+clean-frontend: build-dir-clean frontend-clean-dist frontend-clean-dist-archive
 
 clean-remote:
-	make -C ${APP_PATH}/${GIT_TOOLS} remote-clean
+	@make -C ${APP_PATH}/${GIT_TOOLS} remote-clean > /dev/null 2>&1 || true
 
 clean-config:
-	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws
+	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws > /dev/null 2>&1 || true
 
-clean: clean-elasticsearch clean-config clean-frontend clean-remote
+clean: clean-elasticsearch clean-frontend clean-remote clean-config
 
 docker-push:
 	@make -C ${APP_PATH}/${GIT_TOOLS} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
@@ -157,10 +155,10 @@ dev-stop: frontend-dev-stop
 build: frontend-build nginx-build
 
 build-dir:
-	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
+	@if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
 
 build-dir-clean:
-	if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
+	@if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
 
 ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION):
 	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
@@ -184,10 +182,11 @@ $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION): build-dir
 frontend-build: network frontend-build-dist $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION)
 
 frontend-clean-dist:
-	@rm -rf $(FILE_FRONTEND_APP_VERSION)
+	@rm -rf ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION) > /dev/null 2>&1 || true
 
 frontend-clean-dist-archive:
-	@rm -rf $(FILE_FRONTEND_DIST_APP_VERSION)
+	@rm -rf ${FRONTEND}/$(FILE_FRONTEND_DIST_APP_VERSION) > /dev/null 2>&1 || true
+	@rm -rf ${NGINX}/$(FILE_FRONTEND_DIST_APP_VERSION) > /dev/null 2>&1 || true
 
 nginx-check-build:
 	${DC} -f $(DC_RUN_NGINX_FRONTEND) config -q
