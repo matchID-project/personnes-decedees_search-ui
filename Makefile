@@ -287,7 +287,7 @@ ${DATA_VERSION_FILE}:
 	@cat ${DATA_VERSION_FILE}.list | sed 's/\s*$$//g' | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
-deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
+deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up backup-dir-clean
 
 deploy-remote: config
 	make -C ${APP_PATH}/${GIT_TOOLS} remote-config remote-deploy remote-actions\
