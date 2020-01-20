@@ -41,7 +41,7 @@ after_success:
     elif [[ "$TRAVIS_BRANCH" == "dev" ]]; then
       make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
       make deploy-local FILES_TO_PROCESS=deces-1970.txt.gz;
-      make deploy-remote FILES_TO_PROCESS=deces-1970.txt.gz;
+      make deploy-remote FILES_TO_PROCESS=deces-1970.txt.gz GIT_BRANCH="$TRAVIS_BRANCH";
     fi
 
 after_script:
