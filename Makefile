@@ -104,16 +104,27 @@ config:
 	@ln -s ${APP_PATH}/${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
+clean-elasticsearch: elasticsearch-stop
+	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE}
+
+
+clean-frontend: build-dir-clean
+	@rm ${NGINX}/$(FILE_FRONTEND_DIST_APP_VERSION)\
+		${FRONTEND}/$(FILE_FRONTEND_APP_VERSION)
+
+clean-remote:
+	make -C ${APP_PATH}/${GIT_TOOLS} remote-clean
+
+clean-config:
+	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws
+
+clean: clean-elasticsearch clean-config clean-frontend clean-remote
+
 docker-push:
 	@make -C ${APP_PATH}/${GIT_TOOLS} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
 
 docker-pull:
 	docker pull ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${APP_VERSION}
-
-clean-elasticsearch: elasticsearch-stop
-	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE}
-
-clean: clean-frontend clean-elasticsearch
 
 network-stop:
 	docker network rm ${DC_NETWORK}
