@@ -100,6 +100,7 @@ config:
 	else\
 		ln -s ${TOOLS_PATH} ${APP_PATH}/${GIT_TOOLS};\
 	fi
+	cp artifacts ${APP_PATH}/${GIT_TOOLS}/
 	@ln -s ${APP_PATH}/${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
@@ -273,6 +274,6 @@ ${DATA_VERSION_FILE}:
 deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
 
 deploy-remote: config
-	make -C ${TOOLS_PATH} remote-actions\
+	make -C ${APP_PATH}/${GIT_TOOLS} remote-actions\
 		APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
 		ACTIONS=deploy-local
