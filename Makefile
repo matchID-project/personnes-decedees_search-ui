@@ -159,7 +159,7 @@ build-dir:
 	@if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
 
 build-dir-clean:
-	@if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
+	@if [ -d "$(BUILD_DIR)" ] ; then (rm -rf $(BUILD_DIR) > /dev/null 2>&1) ; fi
 
 ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION):
 	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
@@ -214,7 +214,7 @@ backup-dir:
 	@if [ ! -d "$(BACKUP_DIR)" ] ; then mkdir -p $(BACKUP_DIR) ; fi
 
 backup-dir-clean:
-	@if [ -d "$(BACKUP_DIR)" ] ; then (rm -rf -p $(BACKUP_DIR) > /dev/null 2>&1) ; fi
+	@if [ -d "$(BACKUP_DIR)" ] ; then (rm -rf $(BACKUP_DIR) > /dev/null 2>&1) ; fi
 
 elasticsearch-s3-pull: backup-dir ${DATAPREP_VERSION_FILE} ${DATA_VERSION_FILE}
 	@\
@@ -288,7 +288,7 @@ ${DATA_VERSION_FILE}:
 	@cat ${DATA_VERSION_FILE}.list | sed 's/\s*$$//g' | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
-deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up backup-dir-clean
+deploy-local: config elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up backup-dir-clean
 
 deploy-remote: config
 	make -C ${APP_PATH}/${GIT_TOOLS} remote-config remote-deploy remote-actions\
