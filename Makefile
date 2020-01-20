@@ -287,4 +287,4 @@ deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-p
 deploy-remote: config
 	make -C ${APP_PATH}/${GIT_TOOLS} remote-actions\
 		APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
-		ACTIONS=deploy-local
+		ACTIONS=deploy-local GIT_BRANCH=${GIT_BRANCH}
