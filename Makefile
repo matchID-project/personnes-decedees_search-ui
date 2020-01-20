@@ -104,9 +104,9 @@ config:
 	@ln -s ${APP_PATH}/${GIT_TOOLS}/aws ${APP_PATH}/aws
 	@touch config
 
-clean-elasticsearch: elasticsearch-stop
-	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE} > /dev/null 2>&1 || true
 
+clean-data: elasticsearch-clean backup-dir-clean
+	@sudo rm -rf ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE} > /dev/null 2>&1 || true
 
 clean-frontend: build-dir-clean frontend-clean-dist frontend-clean-dist-archive
 
@@ -116,7 +116,7 @@ clean-remote:
 clean-config:
 	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws config > /dev/null 2>&1 || true
 
-clean: clean-elasticsearch clean-frontend clean-remote clean-config
+clean: clean-data clean-frontend clean-remote clean-config
 
 docker-push:
 	@make -C ${APP_PATH}/${GIT_TOOLS} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
@@ -212,6 +212,9 @@ start: frontend
 backup-dir:
 	@if [ ! -d "$(BACKUP_DIR)" ] ; then mkdir -p $(BACKUP_DIR) ; fi
 
+backup-dir-clean:
+	@if [ -d "$(BACKUP_DIR)" ] ; then (rm -rf -p $(BACKUP_DIR) > /dev/null 2>&1) ; fi
+
 elasticsearch-s3-pull: backup-dir ${DATAPREP_VERSION_FILE} ${DATA_VERSION_FILE}
 	@\
 	DATAPREP_VERSION=$$(cat ${DATAPREP_VERSION_FILE});\
@@ -239,6 +242,9 @@ elasticsearch-restore: elasticsearch-stop elasticsearch-s3-pull
 		sudo tar xf ${BACKUP_DIR}/$$ESBACKUPFILE -C $$(dirname ${ES_DATA}) && \
 		echo backup restored;\
 	fi;
+
+elasticsearch-clean: elasticsearch-stop
+	@sudo rm -rf ${ES_DATA} > /dev/null 2>&1 || true
 
 vm_max:
 ifeq ("$(vm_max_count)", "")
@@ -284,6 +290,6 @@ ${DATA_VERSION_FILE}:
 deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
 
 deploy-remote: config
-	make -C ${APP_PATH}/${GIT_TOOLS} remote-actions\
+	make -C ${APP_PATH}/${GIT_TOOLS} remote-config remote-deploy remote-actions\
 		APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
 		ACTIONS=deploy-local GIT_BRANCH=${GIT_BRANCH}
