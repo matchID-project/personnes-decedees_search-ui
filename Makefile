@@ -13,7 +13,8 @@ export USE_TTY := $(shell test -t 1 && USE_TTY="-t")
 export PORT=8082
 
 #base paths
-export APP = personnes-decedees-search-ui
+export APP = personnes-decedees_search-ui
+export APP_GROUP = matchID
 export APP_PATH := $(shell pwd)
 export FRONTEND := ${APP_PATH}
 export FRONTEND_DEV_HOST = frontend-development
@@ -25,17 +26,20 @@ export API_USER_SCOPE=http_x_forwarded_for
 export API_GLOBAL_LIMIT_RATE=20r/s
 export API_GLOBAL_BURST=200 nodelay
 
-export DOCKER_USERNAME=matchid
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
-export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
+export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+export DC_IMAGE_NAME = ${DC_PREFIX}
 export DC_NETWORK := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_BUILD_ARGS = --pull --no-cache
+
 export DC := /usr/local/bin/docker-compose
 export GIT_ORIGIN=origin
-export GIT_BRANCH=master
+export GIT_BRANCH := $(shell git branch | grep '*' | awk '{print $$2}')
+export GIT_BRANCH_MASTER=master
 export GIT_DATAPREP = personnes-decedees_search
 export GIT_ROOT = https://github.com/matchid-project
+export GIT_TOOLS = tools
 
 # backup dir
 export BACKUP_DIR = ${APP_PATH}/backup
@@ -80,59 +84,50 @@ export FILE_FRONTEND_APP_VERSION = $(APP)-$(APP_VERSION)-frontend.tar.gz
 export FILE_FRONTEND_DIST_APP_VERSION = $(APP)-$(APP_VERSION)-frontend-dist.tar.gz
 export FILE_FRONTEND_DIST_LATEST_VERSION = $(APP)-latest-frontend-dist.tar.gz
 
+export DOCKER_USERNAME=matchid
 export DC_BUILD_FRONTEND = ${DC_FILE}-build.yml
 export DC_RUN_NGINX_FRONTEND = ${DC_FILE}.yml
 export BUILD_DIR=${APP_PATH}/${APP}-build
 
 include /etc/os-release
 
+config:
+	# this proc relies on matchid/tools and works both local and remote
+	@sudo apt-get install make
+	@if [ -z "${TOOLS_PATH}" ];then\
+		git clone ${GIT_ROOT}/${GIT_TOOLS};\
+		make -C ${APP_PATH}/${GIT_TOOLS} config;\
+	else\
+		ln -s ${TOOLS_PATH} ${APP_PATH}/${GIT_TOOLS};\
+	fi
+	cp artifacts ${APP_PATH}/${GIT_TOOLS}/
+	@ln -s ${APP_PATH}/${GIT_TOOLS}/aws ${APP_PATH}/aws
+	@touch config
 
-install-prerequisites:
-ifeq ("$(wildcard /usr/bin/envsubst)","")
-	sudo apt-get update || true
-	sudo apt install -y gettext || true
-endif
 
-ifeq ("$(wildcard /usr/bin/docker)","")
-	echo install docker-ce, still to be tested
-	sudo apt-get update
-	sudo apt-get install \
-    	apt-transport-https \
-	ca-certificates \
-	curl \
-	software-properties-common
+clean-data: elasticsearch-clean backup-dir-clean
+	@sudo rm -rf ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE} > /dev/null 2>&1 || true
 
-	curl -fsSL https://download.docker.com/linux/${ID}/gpg | sudo apt-key add -
-	sudo add-apt-repository \
-		"deb https://download.docker.com/linux/ubuntu \
-		`lsb_release -cs` \
-   		stable"
-	sudo apt-get update
-	sudo apt-get install -y docker-ce
-endif
-	@(if (id -Gn ${USER} | grep -vc docker); then sudo usermod -aG docker ${USER}; fi) > /dev/null
-ifeq ("$(wildcard /usr/local/bin/docker-compose)","")
-	@echo installing docker-compose
-	@sudo curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-	@sudo chmod +x /usr/local/bin/docker-compose
-endif
+clean-frontend: build-dir-clean frontend-clean-dist frontend-clean-dist-archive
 
-install-aws-cli:
-	@docker-pull matchid/tools
+clean-remote:
+	@make -C ${APP_PATH}/${GIT_TOOLS} remote-clean > /dev/null 2>&1 || true
 
-clean-frontend:
-	@sudo rm -rf ${FRONTEND}/dist
-	@sudo mkdir -p ${FRONTEND}/dist
+clean-config:
+	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws config > /dev/null 2>&1 || true
 
-clean-elasticsearch: elasticsearch-stop
-	@sudo rm -rf ${ES_DATA} ${BACKUP_DIR} ${DATA_VERSION_FILE} ${DATAPREP_VERSION_FILE}
+clean: clean-data clean-frontend clean-remote clean-config
 
-clean: clean-frontend clean-elasticsearch
+docker-push:
+	@make -C ${APP_PATH}/${GIT_TOOLS} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
+
+docker-pull:
+	docker pull ${DOCKER_USERNAME}/${DC_IMAGE_NAME}:${APP_VERSION}
 
 network-stop:
 	docker network rm ${DC_NETWORK}
 
-network: install-prerequisites
+network: config
 	@docker network create ${DC_NETWORK_OPT} ${DC_NETWORK} 2> /dev/null; true
 
 frontend-update:
@@ -159,21 +154,11 @@ dev-stop: frontend-dev-stop
 
 build: frontend-build nginx-build
 
-docker-push: docker-login
-	docker push ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
-
-docker-login:
-	@echo docker login for ${DOCKER_USERNAME}
-	@echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-
-docker-pull:
-	docker pull ${DOCKER_USERNAME}/${APP}:${APP_VERSION}
-
 build-dir:
-	if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
+	@if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
 
 build-dir-clean:
-	if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
+	@if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
 
 ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION):
 	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
@@ -197,17 +182,18 @@ $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION): build-dir
 frontend-build: network frontend-build-dist $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION)
 
 frontend-clean-dist:
-	@rm -rf $(FILE_FRONTEND_APP_VERSION)
+	@rm -rf ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION) > /dev/null 2>&1 || true
 
 frontend-clean-dist-archive:
-	@rm -rf $(FILE_FRONTEND_DIST_APP_VERSION)
+	@rm -rf ${FRONTEND}/$(FILE_FRONTEND_DIST_APP_VERSION) > /dev/null 2>&1 || true
+	@rm -rf ${NGINX}/$(FILE_FRONTEND_DIST_APP_VERSION) > /dev/null 2>&1 || true
 
 nginx-check-build:
 	${DC} -f $(DC_RUN_NGINX_FRONTEND) config -q
 
 nginx-build: $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) nginx-check-build
 	@echo building ${APP} nginx
-	cp $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) nginx/
+	cp $(BUILD_DIR)/$(FILE_FRONTEND_DIST_APP_VERSION) ${NGINX}/
 	${DC} -f $(DC_RUN_NGINX_FRONTEND) build $(DC_BUILD_ARGS)
 
 frontend-stop:
@@ -225,6 +211,9 @@ start: frontend
 
 backup-dir:
 	@if [ ! -d "$(BACKUP_DIR)" ] ; then mkdir -p $(BACKUP_DIR) ; fi
+
+backup-dir-clean:
+	@if [ -d "$(BACKUP_DIR)" ] ; then (rm -rf -p $(BACKUP_DIR) > /dev/null 2>&1) ; fi
 
 elasticsearch-s3-pull: backup-dir ${DATAPREP_VERSION_FILE} ${DATA_VERSION_FILE}
 	@\
@@ -253,6 +242,9 @@ elasticsearch-restore: elasticsearch-stop elasticsearch-s3-pull
 		sudo tar xf ${BACKUP_DIR}/$$ESBACKUPFILE -C $$(dirname ${ES_DATA}) && \
 		echo backup restored;\
 	fi;
+
+elasticsearch-clean: elasticsearch-stop
+	@sudo rm -rf ${ES_DATA} > /dev/null 2>&1 || true
 
 vm_max:
 ifeq ("$(vm_max_count)", "")
@@ -291,29 +283,13 @@ ${DATAPREP_VERSION_FILE}: ${GIT_DATAPREP}
 
 ${DATA_VERSION_FILE}:
 	@${AWS} s3 ls ${S3_BUCKET} | egrep '${FILES_TO_PROCESS}' |\
-		awk '{print $$NF}' | sort | sha1sum | awk '{print $1}' |\
+		awk '{print $$NF}' | sort > ${DATA_VERSION_FILE}.list
+	@cat ${DATA_VERSION_FILE}.list | sed 's/\s*$$//g' | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
 deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
 
-deploy-remote:
-	@if [ -z "${REMOTE_HOST}" -o -z "${aws_access_key_id}" -o -z "${aws_access_key_id}" ];\
-		then echo you have to specify REMOTE_HOST aws_access_key_id and aws_access_key_id;fi
-	@ssh ${REMOTE_HOST} 'if [ -d "$$(basename ${APP_PATH})" ]; then \
-		echo cleaning previsous install;\
-		sudo rm -rf $$(basename ${APP_PATH});fi'
-	@echo remote cloning Github repo
-	@ssh ${REMOTE_HOST} git clone https://github.com/matchid-project/personnes-decedees_search-ui
-	@echo terraforming
-	@ssh ${REMOTE_HOST} make -C $$(basename ${APP_PATH}) install-prerequisites install-aws-cli
-	@echo copy s3 configuration
-	@ssh ${REMOTE_HOST} mkdir -p .aws
-	@scp aws_config ${REMOTE_HOST}:.aws/
-	@echo -e "[default]\naws_access_key_id=${aws_access_key_id}\naws_secret_access_key=${aws_secret_access_key}\n" | ssh ${REMOTE_HOST} 'cat > .aws/credentials'
-	@echo deploying
-	@ssh ${REMOTE_HOST} make -C $$(basename ${APP_PATH}) deploy-local
-	@echo cleaning secrets
-	@ssh ${REMOTE_HOST} rm .aws/credentials
-	@echo testing remote services
-	@ssh ${REMOTE_HOST} '(curl -s --fail -XGET "http://localhost:${PORT}/" > /dev/null)' && echo frontend ok
-	@ssh ${REMOTE_HOST} '(curl -s --fail -XPOST "http://localhost:${PORT}${ES_PROXY_PATH}/?q=*" -H "Content-Type: application/json" > /dev/null)' && echo elasticsearch ok
+deploy-remote: config
+	make -C ${APP_PATH}/${GIT_TOOLS} remote-config remote-deploy remote-actions\
+		APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
+		ACTIONS=deploy-local GIT_BRANCH=${GIT_BRANCH}

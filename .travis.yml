@@ -26,14 +26,22 @@ before_script:
   - uname -a
   - type -a docker-compose && docker-compose version
   - docker version
+  - echo "$SSHENC" | base64 -d | gpg -d --passphrase $SSHPWD --batch > /tmp/id_rsa_matchID
+  - eval "$(ssh-agent -s)"
+  - chmod 600 /tmp/id_rsa_matchID
+  - ssh-add /tmp/id_rsa_matchID
 
 script:
   - git fetch --unshallow && git tag -l
-  - make build
+  - make config build
 
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
-      make docker-push ;
+      make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
+    elif [[ "$TRAVIS_BRANCH" == "dev" ]]; then
+      make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
+      make deploy-local FILES_TO_PROCESS=deces-1970.txt.gz;
+      make deploy-remote FILES_TO_PROCESS=deces-1970.txt.gz GIT_BRANCH="$TRAVIS_BRANCH";
     fi
 
 after_script:

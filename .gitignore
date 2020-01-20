@@ -4,9 +4,12 @@ artifacts
 dist
 dist-build
 personnes-decedees-search-ui-*
+personnes-decedees_search
 docker-compose-elasticsearch-huge.yml
 backup
 esdata
+config
+tools
 .data.sha1
 .dataprep.sha1
 
