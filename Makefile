@@ -114,7 +114,7 @@ clean-remote:
 	@make -C ${APP_PATH}/${GIT_TOOLS} remote-clean > /dev/null 2>&1 || true
 
 clean-config:
-	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws > /dev/null 2>&1 || true
+	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws config > /dev/null 2>&1 || true
 
 clean: clean-elasticsearch clean-frontend clean-remote clean-config
 
