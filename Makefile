@@ -16,6 +16,7 @@ export PORT=8082
 export APP = personnes-decedees_search-ui
 export APP_GROUP = matchID
 export APP_PATH := $(shell pwd)
+export APP_DNS=deces.matchid.io
 export FRONTEND := ${APP_PATH}
 export FRONTEND_DEV_HOST = frontend-development
 export FRONTEND_DEV_PORT = ${PORT}
@@ -25,6 +26,8 @@ export API_USER_BURST=20 nodelay
 export API_USER_SCOPE=http_x_forwarded_for
 export API_GLOBAL_LIMIT_RATE=20r/s
 export API_GLOBAL_BURST=200 nodelay
+export API_TEST_JSON=hits
+export API_TEST_REQUEST={"query":{"match_all":{}}}
 
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
@@ -290,7 +293,31 @@ ${DATA_VERSION_FILE}:
 
 deploy-local: config elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up backup-dir-clean
 
-deploy-remote: config
-	make -C ${APP_PATH}/${GIT_TOOLS} remote-config remote-deploy remote-actions\
+deploy-remote-instance: config
+	@make -C ${APP_PATH}/${GIT_TOOLS} remote-config\
+			APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
+			GIT_BRANCH=${GIT_BRANCH} ${MAKEOVERRIDES}
+
+deploy-remote-services:
+	@make -C ${APP_PATH}/${GIT_TOOLS} remote-deploy remote-actions\
 		APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
-		ACTIONS=deploy-local GIT_BRANCH=${GIT_BRANCH}
+		ACTIONS=deploy-local GIT_BRANCH=${GIT_BRANCH} ${MAKEOVERRIDES}
+
+deploy-remote-publish:
+	@if [ -z "${NGINX_HOST}" -o -z "${NGINX_USER}" ];then\
+		(echo "can't deploy without NGINX_HOST and NGINX_USER" && exit 1);\
+	fi;
+	@if [ "${GIT_BRANCH}" == "${GIT_BRANCH_MASTER}" ];then\
+		APP_DNS=${APP_DNS};\
+	else\
+		APP_DNS="${GIT_BRANCH}-${APP_DNS}";\
+	fi;\
+	echo "zzz $$APP_DNS";\
+	make -C ${APP_PATH}/${GIT_TOOLS} remote-test-api-in-vpc nginx-conf-apply remote-test-api\
+		APP=${APP} APP_VERSION=${APP_VERSION} GIT_BRANCH=${GIT_BRANCH} PORT=${PORT}\
+		APP_DNS=$$APP_DNS API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON=${API_TEST_JSON} API_TEST_DATA=${API_TEST_REQUEST}\
+		${MAKEOVERRIDES}
+
+deploy-remote: config deploy-remote-instance deploy-remote-services deploy-remote-publish
+
+

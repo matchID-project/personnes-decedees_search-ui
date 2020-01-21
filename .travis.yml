@@ -41,6 +41,7 @@ script:
 after_success:
   - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
       make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
+      make deploy-remote GIT_BRANCH="$TRAVIS_BRANCH" SCW_IMAGE_ID=d4067cdc-dc9d-4810-8a26-0dae51d7df42 SCW_FLAVOR=GP1-XS;
     elif [[ "$TRAVIS_BRANCH" == "dev" ]]; then
       make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
       make deploy-local FILES_TO_PROCESS=deces-1970.txt.gz;
