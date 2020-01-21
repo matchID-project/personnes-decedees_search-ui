@@ -26,7 +26,7 @@ export API_USER_BURST=20 nodelay
 export API_USER_SCOPE=http_x_forwarded_for
 export API_GLOBAL_LIMIT_RATE=20r/s
 export API_GLOBAL_BURST=200 nodelay
-export API_TEST_JSON=hits
+export API_TEST_JSON_PATH=hits
 export API_TEST_REQUEST={"query":{"match_all":{}}}
 
 export DC_DIR=${APP_PATH}
@@ -315,7 +315,7 @@ deploy-remote-publish:
 	echo "zzz $$APP_DNS";\
 	make -C ${APP_PATH}/${GIT_TOOLS} remote-test-api-in-vpc nginx-conf-apply remote-test-api\
 		APP=${APP} APP_VERSION=${APP_VERSION} GIT_BRANCH=${GIT_BRANCH} PORT=${PORT}\
-		APP_DNS=$$APP_DNS API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON=${API_TEST_JSON} API_TEST_DATA=${API_TEST_REQUEST}\
+		APP_DNS=$$APP_DNS API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON_PATH=${API_TEST_JSON_PATH} API_TEST_DATA=${API_TEST_REQUEST}\
 		${MAKEOVERRIDES}
 
 deploy-remote: config deploy-remote-instance deploy-remote-services deploy-remote-publish
