@@ -321,12 +321,16 @@ deploy-remote-publish:
 	else\
 		APP_DNS="${GIT_BRANCH}-${APP_DNS}";\
 	fi;\
-	echo "zzz $$APP_DNS";\
 	make -C ${APP_PATH}/${GIT_TOOLS} remote-test-api-in-vpc nginx-conf-apply remote-test-api\
 		APP=${APP} APP_VERSION=${APP_VERSION} GIT_BRANCH=${GIT_BRANCH} PORT=${PORT}\
-		APP_DNS=$$APP_DNS API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON_PATH=${API_TEST_JSON_PATH} API_TEST_DATA=${API_TEST_REQUEST}\
+		APP_DNS=$$APP_DNS API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON_PATH=${API_TEST_JSON_PATH} API_TEST_DATA='${API_TEST_REQUEST}'\
 		${MAKEOVERRIDES}
 
-deploy-remote: config deploy-remote-instance deploy-remote-services deploy-remote-publish
+deploy-delete-old:
+	@make -C ${APP_PATH}/${GIT_TOOLS} cloud-instance-down-invalid\
+		APP=${APP} APP_VERSION=${APP_VERSION} GIT_BRANCH=${GIT_BRANCH} ${MAKEOVERRIDES}
+
+deploy-remote: config deploy-remote-instance deploy-remote-services deploy-remote-publish deploy-delete-old
+
 
 
