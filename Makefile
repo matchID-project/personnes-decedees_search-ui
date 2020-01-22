@@ -21,7 +21,7 @@ export FRONTEND := ${APP_PATH}
 export FRONTEND_DEV_HOST = frontend-development
 export FRONTEND_DEV_PORT = ${PORT}
 export NGINX = ${APP_PATH}/nginx
-export NGINX_TIMEOUT = 15
+export NGINX_TIMEOUT = 30
 export API_USER_LIMIT_RATE=1r/s
 export API_USER_BURST=20 nodelay
 export API_USER_SCOPE=http_x_forwarded_for
@@ -52,7 +52,7 @@ export BACKUP_DIR = ${APP_PATH}/backup
 # elasticsearch defaut configuration
 export ES_HOST = elasticsearch
 export ES_PORT = 9200
-export ES_TIMEOUT = 30
+export ES_TIMEOUT = 60
 export ES_PROXY_PATH = /${API_PATH}/api/v0/search
 export ES_INDEX = deces
 export ES_DATA = ${APP_PATH}/esdata
