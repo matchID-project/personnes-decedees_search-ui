@@ -122,7 +122,9 @@ clean-remote:
 clean-config:
 	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws config > /dev/null 2>&1 || true
 
-clean: clean-data clean-frontend clean-remote clean-config
+clean-local: clean-data clean-frontend clean-config
+
+clean: clean-remote clean-local
 
 docker-push:
 	@make -C ${APP_PATH}/${GIT_TOOLS} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
