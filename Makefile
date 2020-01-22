@@ -294,7 +294,13 @@ ${DATA_VERSION_FILE}:
 	@cat ${DATA_VERSION_FILE}.list | sed 's/\s*$$//g' | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
-deploy-local: config elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up backup-dir-clean
+deploy-local: config elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up backup-dir-clean local-test-api
+
+local-test-api:
+	@make -C ${APP_PATH}/${GIT_TOOLS} local-test-api \
+		PORT=${PORT} \
+		API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON_PATH=${API_TEST_JSON_PATH} API_TEST_DATA='${API_TEST_REQUEST}'\
+		${MAKEOVERRIDES}
 
 deploy-remote-instance: config
 	@make -C ${APP_PATH}/${GIT_TOOLS} remote-config\
