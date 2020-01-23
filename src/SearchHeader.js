@@ -21,7 +21,7 @@ export default function SearchHeader({setSearchTerm}) {
             <br/>
           </span>
           <a
-            href="https://www.insee.fr/fr/information/4190491"
+            href="https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/"
           > source INSEE </a>
         </Heading>
         <CustomSearchBox setSearchTerm={setSearchTerm}/>
