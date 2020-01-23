@@ -16,20 +16,25 @@ export PORT=8082
 export APP = personnes-decedees_search-ui
 export APP_GROUP = matchID
 export APP_PATH := $(shell pwd)
+export APP_DNS=deces.matchid.io
 export FRONTEND := ${APP_PATH}
 export FRONTEND_DEV_HOST = frontend-development
 export FRONTEND_DEV_PORT = ${PORT}
 export NGINX = ${APP_PATH}/nginx
+export NGINX_TIMEOUT = 30
 export API_USER_LIMIT_RATE=1r/s
 export API_USER_BURST=20 nodelay
 export API_USER_SCOPE=http_x_forwarded_for
 export API_GLOBAL_LIMIT_RATE=20r/s
 export API_GLOBAL_BURST=200 nodelay
+export API_TEST_JSON_PATH=hits
+export API_TEST_REQUEST={"query":{"match_all":{}}}
 
 export DC_DIR=${APP_PATH}
 export DC_FILE=${DC_DIR}/docker-compose
 export DC_PREFIX := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]' | tr '_' '-')
 export DC_IMAGE_NAME = ${DC_PREFIX}
+export API_PATH = ${DC_PREFIX}
 export DC_NETWORK := $(shell echo ${APP} | tr '[:upper:]' '[:lower:]')
 export DC_BUILD_ARGS = --pull --no-cache
 
@@ -47,7 +52,8 @@ export BACKUP_DIR = ${APP_PATH}/backup
 # elasticsearch defaut configuration
 export ES_HOST = elasticsearch
 export ES_PORT = 9200
-export ES_PROXY_PATH = /${APP}/api/v0/search
+export ES_TIMEOUT = 60
+export ES_PROXY_PATH = /${API_PATH}/api/v0/search
 export ES_INDEX = deces
 export ES_DATA = ${APP_PATH}/esdata
 export ES_NODES = 1
@@ -116,7 +122,9 @@ clean-remote:
 clean-config:
 	@rm -rf ${APP_PATH}/${GIT_TOOLS} ${APP_PATH}/aws config > /dev/null 2>&1 || true
 
-clean: clean-data clean-frontend clean-remote clean-config
+clean-local: clean-data clean-frontend clean-config
+
+clean: clean-remote clean-local
 
 docker-push:
 	@make -C ${APP_PATH}/${GIT_TOOLS} docker-push DC_IMAGE_NAME=${DC_IMAGE_NAME} APP_VERSION=${APP_VERSION}
@@ -158,7 +166,7 @@ build-dir:
 	@if [ ! -d "$(BUILD_DIR)" ] ; then mkdir -p $(BUILD_DIR) ; fi
 
 build-dir-clean:
-	@if [ -d "$(BUILD_DIR)" ] ; then rm -rf $(BUILD_DIR) ; fi
+	@if [ -d "$(BUILD_DIR)" ] ; then (rm -rf $(BUILD_DIR) > /dev/null 2>&1) ; fi
 
 ${FRONTEND}/$(FILE_FRONTEND_APP_VERSION):
 	( cd ${FRONTEND} && tar -zcvf $(FILE_FRONTEND_APP_VERSION) --exclude ${APP}.tar.gz \
@@ -202,6 +210,7 @@ frontend-stop:
 frontend:
 	@echo docker-compose up ${APP} frontend
 	${DC} -f ${DC_RUN_NGINX_FRONTEND} up -d
+	@timeout=${NGINX_TIMEOUT} ; ret=1 ; until [ "$$timeout" -le 0 -o "$$ret" -eq "0"  ] ; do (curl -s --fail -XGET localhost:${PORT} > /dev/null) ; ret=$$? ; if [ "$$ret" -ne "0" ] ; then echo "waiting for nginx to start $$timeout" ; fi ; ((timeout--)); sleep 1 ; done ; exit $$ret
 
 stop: frontend-stop
 	@echo all components stopped
@@ -213,7 +222,7 @@ backup-dir:
 	@if [ ! -d "$(BACKUP_DIR)" ] ; then mkdir -p $(BACKUP_DIR) ; fi
 
 backup-dir-clean:
-	@if [ -d "$(BACKUP_DIR)" ] ; then (rm -rf -p $(BACKUP_DIR) > /dev/null 2>&1) ; fi
+	@if [ -d "$(BACKUP_DIR)" ] ; then (rm -rf $(BACKUP_DIR) > /dev/null 2>&1) ; fi
 
 elasticsearch-s3-pull: backup-dir ${DATAPREP_VERSION_FILE} ${DATA_VERSION_FILE}
 	@\
@@ -264,7 +273,7 @@ elasticsearch: network vm_max
 	done;\
 	true)
 	${DC} -f ${DC_FILE}-elasticsearch-huge.yml up -d
-
+	@timeout=${ES_TIMEOUT} ; ret=1 ; until [ "$$timeout" -le 0 -o "$$ret" -eq "0"  ] ; do (docker exec -i ${USE_TTY} ${DC_PREFIX}-elasticsearch curl -s --fail -XGET localhost:9200/_cat/indices > /dev/null) ; ret=$$? ; if [ "$$ret" -ne "0" ] ; then echo "waiting for elasticsearch to start $$timeout" ; fi ; ((timeout--)); sleep 1 ; done ; exit $$ret
 
 up: start
 
@@ -287,9 +296,43 @@ ${DATA_VERSION_FILE}:
 	@cat ${DATA_VERSION_FILE}.list | sed 's/\s*$$//g' | sha1sum | awk '{print $1}' |\
 		cut -c-8 > ${DATA_VERSION_FILE}
 
-deploy-local: elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up
+deploy-local: config elasticsearch-s3-pull elasticsearch-restore elasticsearch docker-pull up backup-dir-clean local-test-api
 
-deploy-remote: config
-	make -C ${APP_PATH}/${GIT_TOOLS} remote-config remote-deploy remote-actions\
+local-test-api:
+	@make -C ${APP_PATH}/${GIT_TOOLS} local-test-api \
+		PORT=${PORT} \
+		API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON_PATH=${API_TEST_JSON_PATH} API_TEST_DATA='${API_TEST_REQUEST}'\
+		${MAKEOVERRIDES}
+
+deploy-remote-instance: config
+	@make -C ${APP_PATH}/${GIT_TOOLS} remote-config\
+			APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
+			GIT_BRANCH=${GIT_BRANCH} ${MAKEOVERRIDES}
+
+deploy-remote-services:
+	@make -C ${APP_PATH}/${GIT_TOOLS} remote-deploy remote-actions\
 		APP=${APP} APP_VERSION=${APP_VERSION} DC_IMAGE_NAME=${DC_PREFIX}\
-		ACTIONS=deploy-local GIT_BRANCH=${GIT_BRANCH}
+		ACTIONS=deploy-local GIT_BRANCH=${GIT_BRANCH} ${MAKEOVERRIDES}
+
+deploy-remote-publish:
+	@if [ -z "${NGINX_HOST}" -o -z "${NGINX_USER}" ];then\
+		(echo "can't deploy without NGINX_HOST and NGINX_USER" && exit 1);\
+	fi;
+	@if [ "${GIT_BRANCH}" == "${GIT_BRANCH_MASTER}" ];then\
+		APP_DNS=${APP_DNS};\
+	else\
+		APP_DNS="${GIT_BRANCH}-${APP_DNS}";\
+	fi;\
+	make -C ${APP_PATH}/${GIT_TOOLS} remote-test-api-in-vpc nginx-conf-apply remote-test-api\
+		APP=${APP} APP_VERSION=${APP_VERSION} GIT_BRANCH=${GIT_BRANCH} PORT=${PORT}\
+		APP_DNS=$$APP_DNS API_TEST_PATH=${ES_PROXY_PATH} API_TEST_JSON_PATH=${API_TEST_JSON_PATH} API_TEST_DATA='${API_TEST_REQUEST}'\
+		${MAKEOVERRIDES}
+
+deploy-delete-old:
+	@make -C ${APP_PATH}/${GIT_TOOLS} cloud-instance-down-invalid\
+		APP=${APP} APP_VERSION=${APP_VERSION} GIT_BRANCH=${GIT_BRANCH} ${MAKEOVERRIDES}
+
+deploy-remote: config deploy-remote-instance deploy-remote-services deploy-remote-publish deploy-delete-old
+
+
+
