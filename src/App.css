@@ -1202,7 +1202,8 @@ border-bottom: 1px solid
  position:fixed;
  right:20px;
  top:20px;
- width:40px
+ width:40px;
+ border:none
 }
 .modal-card {
  display:flex;
