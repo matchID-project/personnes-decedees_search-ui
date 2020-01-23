@@ -14,8 +14,14 @@ export default function SearchHeader({setSearchTerm}) {
           fichier des décès
         </Heading>
         <Heading subtitle style={{color: "#fff"}}>
+          <span className="is-hidden-mobile">
+            recherche gratuite parmi
+          </span>
+          <span> <b>25 millions</b> de décès depuis 1970
+            <br/>
+          </span>
           <a
-            href="https://www.insee.fr/fr/information/4190491"
+            href="https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/"
           > source INSEE </a>
         </Heading>
         <CustomSearchBox setSearchTerm={setSearchTerm}/>
