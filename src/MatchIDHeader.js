@@ -117,6 +117,12 @@ export default function MatchIDHeader({toggleModal, modalState, toggleBurger}) {
                                 Les retours sont les bienvenus, nous vous répondrons sur <a href="mailto:matchid.project@gmail.com">matchid.project@gmail.com</a> pour
                                 toute question, signalement ou tout avis sur le service.
                             </p>
+                        <p><strong>Utilisation des cookies</strong></p>
+                            <p>
+                                Ce site utilise les service Cloudflare et Google Analytics qui déposent chacun un cookie pour connaitre la fréquentation et l'audience
+                                du site. Les informations sont anonymes (IP anonymisées). Vous pouvez vous désactiver l'enregistrement de cookies depuis sur site et sur d’autres.
+                                Le moyen le plus efficace consiste à désactiver les cookies dans votre navigateur, n'hésitez pas à consulter l'aide de votre navigateur.
+                            </p>
                         <p><strong>Traitement des données avec matchID</strong></p>
                             <p>
                                 Les données sont traitées avec l'outil opensource <a href="https://matchid.io">matchID</a> (Python/Pandas). Les traitements, disponibles
