@@ -110,6 +110,13 @@ export default function MatchIDHeader({toggleModal, modalState, toggleBurger}) {
                                 en consulat sont enregistrées. Le délai de déclaration et de transmission peut être variable (personnes disparues, ou
                                 recherches historiques e.g. identifications tardives après guerre).
                             </p>
+                            <p>
+                                Les données INSEE sont sous <a href="https://www.etalab.gouv.fr/licence-ouverte-open-licence">Licence Ouverte / Open Licence version 2.0</a>.
+                                L’INSEE et donc ce service ne peuvent garantir que les fichiers des personnes décédées sont exempts d’omissions ou d’erreurs.
+                                Ce service et l'INSEE ne sauraient encourir aucune responsabilité quant à l’utilisation faite des informations contenues dans ces fichiers.
+                                En particulier, les informations contenues dans ces fichiers ne peuvent en aucun cas être utilisées dans un but de certification
+                                du statut vital des personnes.
+                            </p>
                         <p><strong>Conditions d'usage et garanties (version bêta)</strong></p>
                             <p>
                                 Ce service est gratuit, et financé sur fonds personnels. Il est offert sans garantie
