@@ -124,6 +124,10 @@ export default function MatchIDHeader({toggleModal, modalState, toggleBurger}) {
                                 Les retours sont les bienvenus, nous vous répondrons sur <a href="mailto:matchid.project@gmail.com">matchid.project@gmail.com</a> pour
                                 toute question, signalement ou tout avis sur le service.
                             </p>
+                            <p>
+                                Le code source de ce site est disponible sur <a href="https://github.com/matchid-project/personnes-decedees_search-ui">GitHub</a>.
+                                Il est diffusé sous la licence libre <a href="https://spdx.org/licenses/LGPL-3.0.html#licenseText" >LGPL 3.0</a>.
+                            </p>
                         <p><strong>Utilisation des cookies</strong></p>
                             <p>
                                 Ce site utilise les service Cloudflare et Google Analytics qui déposent chacun un cookie pour connaitre la fréquentation et l'audience
