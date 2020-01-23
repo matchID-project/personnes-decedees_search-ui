@@ -1202,7 +1202,8 @@ border-bottom: 1px solid
  position:fixed;
  right:20px;
  top:20px;
- width:40px
+ width:40px;
+ border:none
 }
 .modal-card {
  display:flex;
@@ -1314,6 +1315,9 @@ border-bottom: 1px solid
   margin-top: -8px;
   margin-bottom: -15px;
   margin-left: -12px;
+  }
+  .is-hidden-mobile {
+    display: none
   }
 }
 
