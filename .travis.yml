@@ -41,10 +41,10 @@ script:
       make docker-push GIT_BRANCH="$TRAVIS_BRANCH";
       make deploy-local FILES_TO_PROCESS=deces-1970.txt.gz;
     fi
-  - if [[ "$TRAVIS_BRANCH" == "dev" ]]; then
+  - if [[ ( "$TRAVIS_PULL_REQUEST" = "false" ) && ( "$TRAVIS_BRANCH" == "dev" ) ]]; then
       make deploy-remote FILES_TO_PROCESS=deces-1970.txt.gz GIT_BRANCH="$TRAVIS_BRANCH" NGINX_USER=$NGINX_USER NGINX_HOST=$NGINX_HOST remote_http_proxy=$REMOTE_HTTP_PROXY remote_https_proxy=$REMOTE_HTTP_PROXY remote_no_proxy=localhost;
     fi
-  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+  - if [[ ( "$TRAVIS_PULL_REQUEST" = "false" ) && ( "$TRAVIS_BRANCH" == "master" ) ]]; then
       make deploy-remote GIT_BRANCH="$TRAVIS_BRANCH" ES_MEM=8192m SCW_IMAGE_ID=d4067cdc-dc9d-4810-8a26-0dae51d7df42 SCW_FLAVOR=GP1-XS NGINX_USER=$NGINX_USER NGINX_HOST=$NGINX_HOST remote_http_proxy=$REMOTE_HTTP_PROXY remote_https_proxy=$REMOTE_HTTP_PROXY remote_no_proxy=localhost;
     fi
 
