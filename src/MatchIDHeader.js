@@ -84,28 +84,40 @@ export default function MatchIDHeader({toggleModal, modalState, toggleBurger}) {
                     </Modal.Card.Head>
                     <Modal.Card.Body>
                         <Content>
-                        <p><strong>Conditions d'usage et garanties (version alpha)</strong></p>
+                        <p><strong>A qui s'adresse ce service</strong></p>
                             <p>
-                                Ce service est financé sur fonds personnels et est donc offert sans garantie.
-                                L'usage est limité à une requête par seconde afin de préserver un service pour tous. Selon
-                                l'affluence et les retours, nous envisagerons de le consolider. Contactez nous
-                                sur <a href="mailto:matchid.project@gmail.com">matchid-project@gmail.com</a> pour
-                                toute question ou signaler un problème.
+                                Généalogistes, professionnels ou particuliers, services publics de lutte contre la fraude.
                             </p>
-                            <p><strong>Fichier des personnes décédées</strong></p>
+                        <p><strong>Evolutions à venir</strong></p>
                             <p>
-                                Ce service vise à permettre la recherche directe de personnes décédées. Il exploite la base opendata
+                                Deux évolutions sont prévues dans les prochaines semaines:
+                                <br/>
+                                - une recherche avancée (par lieu/année de naissance/décès)
+                                <br/>
+                                - la possibilité de télécharger les fichiers source restreints aux années et départements
+                                pour favoriser les recherches approfondies
+                            </p>
+                        <p><strong>Fichier des décès de l'INSEE</strong></p>
+                            <p>
+                                Ce service vise à permettre la recherche directe de personnes décédées. Il repose sur la base opendata
                                 délivrée par l'<a href="https://www.insee.fr/fr/information/4190491">INSEE</a> et
                                 diffusée par <a href="https://www.data.gouv.fr/fr/datasets/fichier-des-personnes-decedees/">data.gouv.fr</a>.
                             </p>
                             <p>
-                                Ce service utilise l'intégralité des données INSEE, soit environ 25 millions d'enregistrements.
-                                Il concerne les déclarations de décès retransmises vers l'INSEE depuis 1970 jusqu'au mois précédent.
+                                La recherche utilise l'intégralité des données INSEE, soit environ 25 millions d'enregistrements.
+                                Elle concerne les déclarations de décès retransmises vers l'INSEE depuis 1970 jusqu'au mois précédent.
                                 Seules les personnes ayant eu un numéro INSEE et ayant fait l'objet d'une déclaration de décès, en mairie ou
                                 en consulat sont enregistrées. Le délai de déclaration et de transmission peut être variable (personnes disparues, ou
                                 recherches historiques e.g. identifications tardives après guerre).
                             </p>
-                            <p><strong>Traitement des données avec matchID</strong></p>
+                        <p><strong>Conditions d'usage et garanties (version bêta)</strong></p>
+                            <p>
+                                Ce service est gratuit, et financé sur fonds personnels. Il est offert sans garantie
+                                particulière. Etant donné l'affluence, nous avons choisi de consolider et maintenir ce service.
+                                Les retours sont les bienvenus, nous vous répondrons sur <a href="mailto:matchid.project@gmail.com">matchid.project@gmail.com</a> pour
+                                toute question, signalement ou tout avis sur le service.
+                            </p>
+                        <p><strong>Traitement des données avec matchID</strong></p>
                             <p>
                                 Les données sont traitées avec l'outil opensource <a href="https://matchid.io">matchID</a> (Python/Pandas). Les traitements, disponibles
                                 disponibles <a href="https://github.com/matchid-project/personnes-decedees_search">ici</a>,
